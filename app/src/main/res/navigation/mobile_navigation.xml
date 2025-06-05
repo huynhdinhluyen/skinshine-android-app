@@ -22,4 +22,10 @@
         android:name="com.example.skinshine.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_analyse"
+        android:name="com.example.skinshine.ui.analyse.AnalyseFragment"
+        android:label="Analyse"
+        tools:layout="@layout/fragment_analyse" />
 </navigation>
