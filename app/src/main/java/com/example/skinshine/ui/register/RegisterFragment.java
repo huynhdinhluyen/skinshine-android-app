@@ -83,7 +83,7 @@ public class RegisterFragment extends Fragment {
                                                 userData.put("name", fullName);
                                                 userData.put("email", email);
                                                 userData.put("phone", phone);
-                                                userData.put("role", "admin");
+                                                userData.put("role", "customer");
 
                                                 db.collection("users").document(user.getUid())
                                                         .set(userData)
