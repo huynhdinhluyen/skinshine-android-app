@@ -110,11 +110,12 @@ public class Product {
     public void setRating(int rating) {
         this.rating = rating;
     }
-
+    @PropertyName("suitable_skin_types")
     public List<String> getSuitableSkinTypes() {
         return suitableSkinTypes;
     }
 
+    @PropertyName("suitable_skin_types")
     public void setSuitableSkinTypes(List<String> suitableSkinTypes) {
         this.suitableSkinTypes = suitableSkinTypes;
     }

@@ -12,8 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.example.skinshine.R;
+import com.example.skinshine.data.model.Product;
 import com.example.skinshine.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
@@ -58,19 +62,18 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupProductRecyclerView() {
-        productAdapter = new ProductAdapter(getContext(), new ArrayList<>() /*, this::onProductClicked */);
+        productAdapter = new ProductAdapter(getContext(), new ArrayList<>(), this::onProductClicked);
         binding.recyclerViewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 cột
         binding.recyclerViewProducts.setAdapter(productAdapter);
         binding.recyclerViewProducts.setNestedScrollingEnabled(false); // Quan trọng khi RecyclerView trong NestedScrollView
     }
 
-    // private void onProductClicked(Product product) {
-    // Navigate to product detail screen
-    // NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-    // HomeFragmentDirections.ActionNavigationHomeToProductDetailFragment action =
-    //        HomeFragmentDirections.actionNavigationHomeToProductDetailFragment(product.getId());
-    // navController.navigate(action);
-    // }
+    private void onProductClicked(Product product) {
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        Bundle bundle = new Bundle();
+        bundle.putString("productId", product.getId());
+        navController.navigate(R.id.productDetailFragment, bundle);
+    }
 
     private void observeViewModel() {
         binding.progressBarHome.setVisibility(View.VISIBLE);

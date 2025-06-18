@@ -1,26 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/android:windowBackground"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.home.HomeFragment"
+    android:background="?android:windowBackground">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"> <!-- Hoặc theme tùy chỉnh -->
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_home"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:title="@string/app_name"
-            app:titleTextColor="@color/white" />
-        <!-- Bạn có thể thêm search bar vào đây nếu muốn -->
+            android:background="?attr/colorPrimary">
+
+            <include layout="@layout/fragment_header" />
+        </androidx.appcompat.widget.Toolbar>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -37,7 +39,6 @@
                 android:id="@+id/viewPagerBanner"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
-            <!-- Có thể thêm PageIndicatorView ở đây -->
 
             <TextView
                 android:id="@+id/textViewFeaturedProducts"
@@ -66,7 +67,7 @@
                 android:layout_gravity="center"
                 android:visibility="gone"
                 android:layout_marginTop="16dp"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

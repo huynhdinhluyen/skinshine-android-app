@@ -16,4 +16,5 @@
     <color name="textColorSecondary">#757575</color> <!-- Medium Grey -->
     <color name="dividerColor">#E0E0E0</color> <!-- Light Grey for dividers -->
     <color name="placeholder_bg">#DDDDDD</color>
+    <color name="gray_200">#EEEEEE</color> <!-- Bạn có thể đổi mã màu nếu muốn -->
 </resources>

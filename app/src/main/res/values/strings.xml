@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Skin Shine</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Trang chủ</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_profile">Profile</string>
-    <string name="banner_image_description">Banner Image</string>
-    <string name="product_image_description">Product Image</string>
-    <string name="featured_products">Featured Products</string>
+    <string name="title_notifications">Thông báo</string>
+    <string name="title_profile">Hồ sơ</string>
+    <string name="banner_image_description">Ảnh Banner</string>
+    <string name="product_image_description">Ảnh sản phẩm</string>
+    <string name="featured_products">Sản phẩm nổi bật</string>
     <string name="profile_hello">Xin chào</string>
     <string name="profile_hello_description">Đăng nhập để nhận ưu đãi và tra cứu đơn hàng</string>
     <string name="profile_login_button">Đăng nhập</string>
@@ -49,4 +49,7 @@
 
     <!-- items support -->
     <string name="item_support_store">Danh sách cửa hàng</string>
+
+    <!-- product detail -->
+    <string name="product_image">Ảnh sản phẩm</string>
 </resources>
