@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.skinshine"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
