@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
@@ -89,13 +90,35 @@ public class ProductDetailFragment extends Fragment {
                 .error(R.drawable.ic_error_placeholder)
                 .into(imageProduct);
 
-        // Gán dữ liệu với nhãn rõ ràng
-        textName.setText(product.getName()); // tên có thể giữ nguyên riêng
-        textBrand.setText("🏷️ Thương hiệu: " + product.getBrand());
+        // Gán dữ liệu đơn giản
+        textName.setText(product.getName());
         textPrice.setText("💵 Giá: " + NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(product.getPrice()));
         textDescription.setText("📃 Mô tả: " + product.getDescription());
         textIngredients.setText("🧪 Thành phần: " + product.getIngredients());
-        textCategory.setText("🧴 Loại sản phẩm: " + product.getCategory());
+
+        // Lấy brand từ DocumentReference
+        if (product.getBrand() != null) {
+            product.getBrand().get().addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    String brandName = doc.getString("name");
+                    textBrand.setText("🏷️ Thương hiệu: " + brandName);
+                } else {
+                    textBrand.setText("🏷️ Thương hiệu: Không rõ");
+                }
+            }).addOnFailureListener(e -> textBrand.setText("🏷️ Thương hiệu: Không rõ"));
+        }
+
+        // Lấy category từ DocumentReference
+        if (product.getCategory() != null) {
+            product.getCategory().get().addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    String categoryName = doc.getString("name");
+                    textCategory.setText("🧴 Loại sản phẩm: " + categoryName);
+                } else {
+                    textCategory.setText("🧴 Loại sản phẩm: Không rõ");
+                }
+            }).addOnFailureListener(e -> textCategory.setText("🧴 Loại sản phẩm: Không rõ"));
+        }
 
         // Rating
         if (product.getRating() > 0) {
@@ -107,18 +130,14 @@ public class ProductDetailFragment extends Fragment {
 
         // Phù hợp loại da
         List<String> skinTypes = product.getSuitableSkinTypes();
-
         if (skinTypes != null && !skinTypes.isEmpty()) {
             List<String> cleaned = new ArrayList<>();
             for (String s : skinTypes) {
-                android.util.Log.d("ProductDetail", "Skin type: " + s);
                 cleaned.add(s.replace("\"", "").trim());
             }
             textSkinTypes.setText("✅ Phù hợp: " + String.join(", ", cleaned));
         } else {
-            android.util.Log.d("ProductDetail", "Skin types is null");
             textSkinTypes.setText("Phù hợp: Không rõ");
         }
-
     }
 }

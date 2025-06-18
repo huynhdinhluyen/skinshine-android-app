@@ -1,6 +1,7 @@
 package com.example.skinshine.ui.home;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -52,7 +54,21 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         holder.textViewProductPrice.setText(currencyFormatter.format(product.getPrice()));
 
-        holder.textViewBrand.setText(product.getBrand());
+        if (product.getBrand() != null) {
+            product.getBrand().get().addOnSuccessListener(snapshot -> {
+                if (snapshot.exists()) {
+                    String brandName = snapshot.getString("name");
+                    holder.textViewBrand.setText(brandName != null ? brandName : "Không rõ thương hiệu");
+                } else {
+                    holder.textViewBrand.setText("Không rõ thương hiệu");
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("ProductAdapter", "Lỗi khi lấy brand: " + e.getMessage());
+                holder.textViewBrand.setText("Không rõ thương hiệu");
+            });
+        } else {
+            holder.textViewBrand.setText("Không rõ thương hiệu");
+        }
 
         if (product.getRating() > 0) {
             holder.ratingBar.setVisibility(View.VISIBLE);
