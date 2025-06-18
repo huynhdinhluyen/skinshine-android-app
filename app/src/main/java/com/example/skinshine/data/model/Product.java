@@ -1,5 +1,6 @@
 package com.example.skinshine.data.model;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.PropertyName;
 
 import java.util.List;
@@ -7,13 +8,13 @@ import java.util.List;
 public class Product {
     private String id;
     private String name;
-    private String brand;
+    private DocumentReference brand;
     private String description;
     private String ingredients;
     private Long price;
     @PropertyName("image_url")
     private String imageUrl;
-    private String category;
+    private DocumentReference category;
     private int rating;
     @PropertyName("suitable_skin_types")
     private List<String> suitableSkinTypes;
@@ -23,7 +24,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String name, String brand, String description, String ingredients, Long price, String imageUrl, String category, int rating, List<String> suitableSkinTypes, boolean isActive) {
+    public Product(String id, String name, DocumentReference brand, String description, String ingredients, Long price, String imageUrl, DocumentReference category, int rating, List<String> suitableSkinTypes, boolean isActive) {
         this.id = id;
         this.name = name;
         this.brand = brand;
@@ -53,11 +54,11 @@ public class Product {
         this.name = name;
     }
 
-    public String getBrand() {
+    public DocumentReference getBrand() {
         return brand;
     }
 
-    public void setBrand(String brand) {
+    public void setBrand(DocumentReference brand) {
         this.brand = brand;
     }
 
@@ -95,11 +96,11 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public String getCategory() {
+    public DocumentReference getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(DocumentReference category) {
         this.category = category;
     }
 

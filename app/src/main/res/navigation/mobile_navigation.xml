@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
+        android:id="@+id/navigation_category"
+        android:name="com.example.skinshine.ui.category.CategoryFragment"
+        android:label="Danh mục"
+        tools:layout="@layout/fragment_category" />
+
+    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.skinshine.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
