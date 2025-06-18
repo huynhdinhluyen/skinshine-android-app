@@ -36,7 +36,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.loginFragment) {
+            if (destination.getId() == R.id.loginFragment ||
+                    destination.getId() == R.id.cartFragment ||
+                    destination.getId() == R.id.registerFragment ||
+                    destination.getId() == R.id.productDetailFragment) {
                 binding.navView.setVisibility(View.GONE);
             } else {
                 binding.navView.setVisibility(View.VISIBLE);
