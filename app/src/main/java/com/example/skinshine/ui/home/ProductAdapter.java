@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,16 +24,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private final List<Product> productList;
     private final Context context;
-    // private OnProductClickListener listener; // Interface for click events
+    private final OnProductClickListener listener;
 
-    // public interface OnProductClickListener {
-    //    void onProductClick(Product product);
-    // }
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
+    }
 
-    public ProductAdapter(Context context, List<Product> productList /*, OnProductClickListener listener*/) {
+    public ProductAdapter(Context context, List<Product> productList, OnProductClickListener listener) {
         this.context = context;
         this.productList = productList;
-        // this.listener = listener;
+        this.listener = listener;
     }
 
     @NonNull
@@ -45,9 +46,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
+
         holder.textViewProductName.setText(product.getName());
+
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         holder.textViewProductPrice.setText(currencyFormatter.format(product.getPrice()));
+
+        holder.textViewBrand.setText(product.getBrand());
+
+        if (product.getRating() > 0) {
+            holder.ratingBar.setVisibility(View.VISIBLE);
+            holder.ratingBar.setRating(product.getRating());
+        } else {
+            holder.ratingBar.setVisibility(View.GONE);
+        }
 
         String imageUrl = product.getImageUrl();
         if (imageUrl != null && !imageUrl.isEmpty()) {
@@ -60,7 +72,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.imageViewProduct.setImageResource(R.drawable.ic_error_placeholder);
         }
 
-        // holder.itemView.setOnClickListener(v -> listener.onProductClick(product));
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(product);
+            }
+        });
     }
 
     @Override
@@ -81,12 +97,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         ImageView imageViewProduct;
         TextView textViewProductName;
         TextView textViewProductPrice;
+        TextView textViewBrand;
+        RatingBar ratingBar;
 
-        ProductViewHolder(@NonNull View itemView) {
+        public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProduct = itemView.findViewById(R.id.imageViewProduct);
             textViewProductName = itemView.findViewById(R.id.textViewProductName);
             textViewProductPrice = itemView.findViewById(R.id.textViewProductPrice);
+            textViewBrand = itemView.findViewById(R.id.textViewBrand);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="?attr/colorPrimary">
+
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:hint="Tìm kiếm sản phẩm"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="8dp"
+        android:background="@drawable/search_box_bg"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="#888888"
+        android:textSize="14sp"
+        android:inputType="text" />
+
+
+    <ImageView
+        android:id="@+id/iconCart"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/outline_add_shopping_cart_24"
+        android:contentDescription="Giỏ hàng" />
+</LinearLayout>
