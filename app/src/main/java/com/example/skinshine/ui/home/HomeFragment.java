@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
 import com.example.skinshine.databinding.FragmentHomeBinding;
+import com.example.skinshine.utils.CartBadgeHelper;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -52,22 +53,19 @@ public class HomeFragment extends Fragment {
     private void setupToolbar() {
         Toolbar toolbar = binding.toolbarHome;
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        // ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
     }
 
 
     private void setupBannerViewPager() {
         bannerAdapter = new BannerAdapter(getContext(), new ArrayList<>());
         binding.viewPagerBanner.setAdapter(bannerAdapter);
-        // Optional: Add page transformer for animations
-        // binding.viewPagerBanner.setPageTransformer(new ZoomOutPageTransformer());
     }
 
     private void setupProductRecyclerView() {
         productAdapter = new ProductAdapter(getContext(), new ArrayList<>(), this::onProductClicked);
-        binding.recyclerViewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 cột
+        binding.recyclerViewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
         binding.recyclerViewProducts.setAdapter(productAdapter);
-        binding.recyclerViewProducts.setNestedScrollingEnabled(false); // Quan trọng khi RecyclerView trong NestedScrollView
+        binding.recyclerViewProducts.setNestedScrollingEnabled(false);
     }
 
     private void onProductClicked(Product product) {
@@ -115,7 +113,7 @@ public class HomeFragment extends Fragment {
     private void startBannerAutoSlide(int numberOfBanners) {
         if (numberOfBanners <= 1) return;
 
-        stopBannerAutoSlide(); // Dừng timer cũ nếu có
+        stopBannerAutoSlide(); 
         bannerTimer = new Timer();
         long BANNER_SLIDE_DELAY = 3000;
         long BANNER_SLIDE_PERIOD = 5000;
@@ -142,25 +140,30 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ImageView iconCart = view.findViewById(R.id.iconCart); // hoặc getView().findViewById...
+        View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
+        ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+
         iconCart.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.cartFragment); // cartFragment phải có trong nav_graph.xml
+            navController.navigate(R.id.navigation_cart);
         });
+
+        CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View cartBadgeContainer = getView().findViewById(R.id.cartBadgeContainer);
+        if (cartBadgeContainer != null) {
+            CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         stopBannerAutoSlide();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (bannerAdapter != null && bannerAdapter.getItemCount() > 1) {
-            startBannerAutoSlide(bannerAdapter.getItemCount());
-        }
     }
 
     @Override

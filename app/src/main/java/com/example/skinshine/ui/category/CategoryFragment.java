@@ -14,6 +14,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.skinshine.R;
+import com.example.skinshine.utils.CartBadgeHelper;
 
 public class CategoryFragment extends Fragment {
 
@@ -28,19 +29,24 @@ public class CategoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ImageView iconCart = view.findViewById(R.id.iconCart);
-        tabCategory = view.findViewById(R.id.tabCategory);
-        tabBrand = view.findViewById(R.id.tabBrand);
-        contentContainer = view.findViewById(R.id.contentContainer);
+        View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
+        ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
 
-        showCategoryContent();
-
-        tabCategory.setOnClickListener(v -> showCategoryContent());
-        tabBrand.setOnClickListener(v -> showBrandContent());
         iconCart.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.cartFragment);
+            navController.navigate(R.id.navigation_cart);
         });
+
+        CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View cartBadgeContainer = getView().findViewById(R.id.cartBadgeContainer);
+        if (cartBadgeContainer != null) {
+            CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+        }
     }
 
     private void showCategoryContent() {

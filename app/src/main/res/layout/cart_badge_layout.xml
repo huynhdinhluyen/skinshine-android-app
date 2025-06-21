@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iconCart"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/outline_add_shopping_cart_24"
+        android:contentDescription="Giỏ hàng" />
+
+    <TextView
+        android:id="@+id/cartBadge"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-6dp"
+        android:layout_marginEnd="-6dp"
+        android:background="@drawable/cart_badge_bg"
+        android:gravity="center"
+        android:text="0"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</FrameLayout>
