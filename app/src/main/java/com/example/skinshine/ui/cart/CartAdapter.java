@@ -55,15 +55,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 .placeholder(R.drawable.ic_placeholder)
                 .into(holder.imageProduct);
 
-        // Xử lý checkbox chọn
-        holder.checkBox.setOnCheckedChangeListener(null); // tránh trigger khi bind lại
+        holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(item.isSelected());
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             item.setSelected(isChecked);
             listener.onItemSelected(item, isChecked);
         });
 
-        // Tăng số lượng
         holder.btnPlus.setOnClickListener(v -> {
             int newQuantity = item.getQuantity() + 1;
             item.setQuantity(newQuantity);
@@ -71,7 +69,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             listener.onQuantityChanged(item, newQuantity);
         });
 
-        // Giảm số lượng
         holder.btnMinus.setOnClickListener(v -> {
             if (item.getQuantity() > 1) {
                 int newQuantity = item.getQuantity() - 1;
@@ -81,7 +78,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             }
         });
 
-        // Xoá sản phẩm
         holder.btnDelete.setOnClickListener(v -> listener.onDeleteItem(item));
     }
 
