@@ -1,42 +1,65 @@
 package com.example.skinshine.ui.analyse;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.skinshine.R;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutionException;
 
 public class AnalyseFragment extends Fragment {
+    private static final String TAG = "AnalyseFragment";
+    private AnalyseViewModel viewModel;
+    private PreviewView cameraPreview;
+    private ImageView capturedImageView;
+    private CardView resultCard;
+    private TextView resultText;
+    private Button captureButton;
+    private Button helpButton;
+    private Button retryButton;
 
-    private String[] questions = {
-            "How does your skin feel a few hours after cleansing?",
-            "How often do you experience shine on your face?",
-            "Do you have visible dry or flaky patches?",
-            "Is your skin easily irritated or red?",
-            "How visible are your pores?"
-    };
+    private ProcessCameraProvider cameraProvider;
+    private ImageCapture imageCapture;
 
-    private String[][] options = {
-            {"Tight/dry", "Normal", "Oily", "Combination", "Sensitive"},
-            {"Rarely", "Sometimes", "Often", "Only T-zone", "Never"},
-            {"Often", "Rarely", "Never", "Sometimes", "Occasionally"},
-            {"Very easily", "Sometimes", "Rarely", "Never", "Often"},
-            {"Small", "Medium", "Large", "Large on T-zone", "Normal"}
-    };
-
-    // Initialize answers with -1 to indicate unanswered
-    private int[] answers = {-1, -1, -1, -1, -1};
+    // Permission launcher for camera
+    private ActivityResultLauncher<String> cameraPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    setupCamera();
+                } else {
+                    Toast.makeText(getContext(), "Camera permission is required", Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Nullable
     @Override
@@ -44,88 +67,195 @@ public class AnalyseFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_analyse, container, false);
 
-        ViewGroup questionsContainer = root.findViewById(R.id.questions_container);
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(AnalyseViewModel.class);
 
-        // Get reference to result card to show/hide it
-        CardView resultCard = root.findViewById(R.id.result_card);
-        // Initially hide the result card
-        resultCard.setVisibility(View.GONE);
+        // Initialize views
+        cameraPreview = root.findViewById(R.id.camera_preview);
+        capturedImageView = root.findViewById(R.id.captured_image);
+        resultCard = root.findViewById(R.id.result_card);
+        resultText = root.findViewById(R.id.result_text);
+        captureButton = root.findViewById(R.id.capture_button);
+        helpButton = root.findViewById(R.id.help_button);
+        retryButton = root.findViewById(R.id.retry_button);
 
-        TextView resultText = root.findViewById(R.id.result_text);
+        // Set up observers
+        viewModel.getSkinResult().observe(getViewLifecycleOwner(), result -> {
+            resultText.setText("Your skin type: " + result);
+            resultCard.setVisibility(View.VISIBLE);
+        });
 
-        for (int i = 0; i < questions.length; i++) {
-            View qView = inflater.inflate(R.layout.item_question, questionsContainer, false);
-            TextView qText = qView.findViewById(R.id.question_text);
-            qText.setText((i+1) + ". " + questions[i]);
-            
-            RadioGroup rg = qView.findViewById(R.id.options_group);
-            
-            for (int j = 0; j < options[i].length; j++) {
-                RadioButton rb = new RadioButton(getContext());
-                rb.setText(options[i][j]);
-                // Generate unique IDs for each RadioButton
-                rb.setId(View.generateViewId());
-                rb.setTextSize(15);
-                rb.setTag(j); // Store the answer value
-                rg.addView(rb);
-            }
-            
-            final int questionIndex = i;
-            rg.setOnCheckedChangeListener((group, checkedId) -> {
-                if (checkedId != -1) {
-                    RadioButton selectedButton = group.findViewById(checkedId);
-                    if (selectedButton != null) {
-                        answers[questionIndex] = (int) selectedButton.getTag();
-                    }
-                }
-            });
-            
-            questionsContainer.addView(qView);
+        viewModel.getIsProcessing().observe(getViewLifecycleOwner(), isProcessing -> {
+            captureButton.setEnabled(!isProcessing);
+            helpButton.setEnabled(!isProcessing);
+            captureButton.setText(isProcessing ? "ANALYZING..." : "CAPTURE");
+        });
+
+        // Set up button click listeners
+        captureButton.setOnClickListener(v -> captureImage());
+        helpButton.setOnClickListener(v -> showHelp());
+        retryButton.setOnClickListener(v -> resetCamera());
+
+        // Check camera permission
+        if (ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            setupCamera();
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
 
-        Button submitBtn = root.findViewById(R.id.submit_button);
-
-        submitBtn.setOnClickListener(v -> {
-            boolean allAnswered = true;
-            for (int ans : answers) {
-                if (ans == -1) {
-                    allAnswered = false;
-                    break;
-                }
-            }
-            
-            if (!allAnswered) {
-                Toast.makeText(getContext(), "Please answer all questions", Toast.LENGTH_SHORT).show();
-                resultCard.setVisibility(View.GONE);
-            } else {
-                String skinType = calculateSkinType();
-                resultText.setText("Your skin type: " + skinType);
-                resultCard.setVisibility(View.VISIBLE);
-            }
-        });
+        // Load ONNX model
+        viewModel.loadModel(requireContext());
 
         return root;
     }
 
-    private String calculateSkinType() {
-        int dry = 0, oily = 0, combination = 0, sensitive = 0, normal = 0;
-        
-        for (int ans : answers) {
-            switch (ans) {
-                case 0: dry++; break;
-                case 1: normal++; break;
-                case 2: oily++; break;
-                case 3: combination++; break;
-                case 4: sensitive++; break;
+    private void showHelp() {
+        // Display help information
+        Toast.makeText(requireContext(), 
+                "Position your face in the camera and ensure good lighting for accurate results.",
+                Toast.LENGTH_LONG).show();
+    }
+
+    private void setupCamera() {
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
+                ProcessCameraProvider.getInstance(requireContext());
+
+        cameraProviderFuture.addListener(() -> {
+            try {
+                cameraProvider = cameraProviderFuture.get();
+                bindCameraUseCase();
+            } catch (ExecutionException | InterruptedException e) {
+                Log.e(TAG, "Error setting up camera", e);
+                Toast.makeText(getContext(), "Error setting up camera: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
+        }, ContextCompat.getMainExecutor(requireContext()));
+    }
+
+    private void bindCameraUseCase() {
+        if (cameraProvider == null) return;
+
+        // Unbind previous use cases
+        cameraProvider.unbindAll();
+
+        // Set up preview
+        Preview preview = new Preview.Builder().build();
+        preview.setSurfaceProvider(cameraPreview.getSurfaceProvider());
+
+        // Set up image capture
+        imageCapture = new ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build();
+
+        // Select front camera
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                .build();
+
+        // Bind use cases to camera
+        try {
+            cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageCapture);
+        } catch (Exception e) {
+            Log.e(TAG, "Error binding camera use cases", e);
+            Toast.makeText(getContext(), "Error binding camera: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
         }
-        
-        int max = Math.max(Math.max(Math.max(Math.max(dry, oily), combination), sensitive), normal);
-        
-        if (max == dry) return "Dry";
-        if (max == oily) return "Oily";
-        if (max == combination) return "Combination";
-        if (max == sensitive) return "Sensitive";
-        return "Normal";
+    }
+
+    private void captureImage() {
+        if (imageCapture == null) return;
+
+        // Show processing state
+        viewModel.setProcessing(true);
+
+        // Capture the image
+        imageCapture.takePicture(ContextCompat.getMainExecutor(requireContext()),
+                new ImageCapture.OnImageCapturedCallback() {
+                    @Override
+                    public void onCaptureSuccess(@NonNull ImageProxy imageProxy) {
+                        try {
+                            // Convert image to bitmap
+                            Bitmap bitmap = imageToBitmap(imageProxy);
+
+                            // Display captured image
+                            capturedImageView.setImageBitmap(bitmap);
+                            capturedImageView.setVisibility(View.VISIBLE);
+                            cameraPreview.setVisibility(View.GONE);
+
+                            // Show retry button
+                            captureButton.setVisibility(View.GONE);
+                            helpButton.setVisibility(View.GONE);
+                            retryButton.setVisibility(View.VISIBLE);
+
+                            // Process image with ONNX model
+                            viewModel.processSkinImage(bitmap);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error processing captured image", e);
+                            Toast.makeText(getContext(), "Error processing image: " + e.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                            viewModel.setProcessing(false);
+                        } finally {
+                            // Close the image
+                            imageProxy.close();
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        Log.e(TAG, "Error capturing image", exception);
+                        Toast.makeText(getContext(), "Error capturing image: " +
+                                exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        viewModel.setProcessing(false);
+                    }
+                });
+    }
+
+    private void resetCamera() {
+        // Hide captured image and show camera preview
+        capturedImageView.setVisibility(View.GONE);
+        cameraPreview.setVisibility(View.VISIBLE);
+
+        // Hide retry button
+        captureButton.setVisibility(View.VISIBLE);
+        helpButton.setVisibility(View.VISIBLE);
+        retryButton.setVisibility(View.GONE);
+
+        // Hide results card
+        resultCard.setVisibility(View.GONE);
+
+        // Reset any other state as needed
+        captureButton.setText("CAPTURE");
+        captureButton.setEnabled(true);
+    }
+
+    private Bitmap imageToBitmap(ImageProxy image) {
+        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+        // Handle rotation based on image orientation
+        int rotation = image.getImageInfo().getRotationDegrees();
+        if (rotation != 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            // For front camera, we might need to flip horizontally
+            matrix.postScale(-1, 1); // Flip horizontally for front camera
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
+                    matrix, true);
+        }
+
+        return bitmap;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
+        }
     }
 }
