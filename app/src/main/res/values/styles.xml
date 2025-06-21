@@ -4,4 +4,12 @@
     <style name="RatingBarTheme" parent="Theme.AppCompat.Light">
         <item name="colorControlActivated">#FFA000</item>
     </style>
+
+    <!-- Splash Theme -->
+    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 </resources>
