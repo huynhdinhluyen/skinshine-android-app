@@ -4,11 +4,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.skinshine.R;
 
@@ -25,17 +28,19 @@ public class CategoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Ánh xạ view
+        ImageView iconCart = view.findViewById(R.id.iconCart);
         tabCategory = view.findViewById(R.id.tabCategory);
         tabBrand = view.findViewById(R.id.tabBrand);
         contentContainer = view.findViewById(R.id.contentContainer);
 
-        // Mặc định hiển thị tab "Danh mục"
         showCategoryContent();
 
-        // Xử lý sự kiện tab
         tabCategory.setOnClickListener(v -> showCategoryContent());
         tabBrand.setOnClickListener(v -> showBrandContent());
+        iconCart.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.navigate(R.id.cartFragment);
+        });
     }
 
     private void showCategoryContent() {

@@ -184,6 +184,18 @@ public class ProductDetailFragment extends Fragment {
         });
 
         btnConfirm.setOnClickListener(v -> {
+            // Kiểm tra đăng nhập
+            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                Toast.makeText(getContext(), "Vui lòng đăng nhập để thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+
+                // Nếu dùng Fragment:
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                navController.navigate(R.id.action_productDetailFragment_to_loginFragment);
+
+                dialog.dismiss();
+                return;
+            }
+
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -223,6 +235,7 @@ public class ProductDetailFragment extends Fragment {
                         }
                     });
         });
+
 
         dialog.show();
     }

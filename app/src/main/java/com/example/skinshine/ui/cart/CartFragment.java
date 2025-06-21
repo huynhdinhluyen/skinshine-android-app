@@ -1,5 +1,6 @@
 package com.example.skinshine.ui.cart;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,11 +13,14 @@ import android.app.AlertDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.CartItem;
+import com.example.skinshine.ui.login.LoginFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,8 +39,6 @@ public class CartFragment extends Fragment {
     private TextView textSelectAll;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
     private List<CartItem> cartItems = new ArrayList<>();
     private CartAdapter adapter;
 
@@ -50,17 +52,26 @@ public class CartFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Toast.makeText(getContext(), "Vui lòng đăng nhập để xem giỏ hàng", Toast.LENGTH_SHORT).show();
+            NavController navController = Navigation.findNavController(view);
+            navController.navigate(R.id.action_cartFragment_to_loginFragment);
+            return;
+        }
+
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         emptyCartLayout = view.findViewById(R.id.emptyCartLayout);
         fullCartLayout = view.findViewById(R.id.fullCartLayout);
         recyclerView = view.findViewById(R.id.recyclerViewCart);
         textTotalPrice = view.findViewById(R.id.textTotalPrice);
         btnDeleteSelected = view.findViewById(R.id.btnDeleteSelected);
-        textSelectAll = view.findViewById(R.id.textSelectAll); // ✅ TextView thay icon
+        textSelectAll = view.findViewById(R.id.textSelectAll);
         ImageView iconBack = view.findViewById(R.id.iconBack);
         iconBack.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        btnDeleteSelected.setOnClickListener(v -> confirmDeleteSelectedItems());
+        btnDeleteSelected.setOnClickListener(v -> confirmDeleteSelectedItems(userId));
 
         textSelectAll.setOnClickListener(v -> {
             isAllSelected = !isAllSelected;
@@ -71,10 +82,10 @@ public class CartFragment extends Fragment {
             if (adapter != null) adapter.notifyDataSetChanged();
         });
 
-        fetchCartItems();
+        fetchCartItems(userId);
     }
 
-    private void fetchCartItems() {
+    private void fetchCartItems(String userId) {
         db.collection("users")
                 .document(userId)
                 .collection("cartItems")
@@ -119,7 +130,7 @@ public class CartFragment extends Fragment {
                                                     .collection("cartItems")
                                                     .document(item.getProductId())
                                                     .delete()
-                                                    .addOnSuccessListener(v -> fetchCartItems());
+                                                    .addOnSuccessListener(v -> fetchCartItems(userId));
                                         })
                                         .setNegativeButton("Hủy", null)
                                         .show();
@@ -151,7 +162,7 @@ public class CartFragment extends Fragment {
         textTotalPrice.setText(formattedTotal);
     }
 
-    private void confirmDeleteSelectedItems() {
+    private void confirmDeleteSelectedItems(String userId) {
         List<CartItem> selectedItems = new ArrayList<>();
         for (CartItem item : cartItems) {
             if (item.isSelected()) {
@@ -175,7 +186,7 @@ public class CartFragment extends Fragment {
                                 .document(item.getProductId())
                                 .delete();
                     }
-                    fetchCartItems();
+                    fetchCartItems(userId);
                 })
                 .setNegativeButton("Hủy", null)
                 .show();

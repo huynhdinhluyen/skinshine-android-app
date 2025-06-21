@@ -6,6 +6,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,8 +81,12 @@ public class BrandContentFragment extends Fragment {
                     }
 
                     productAdapter = new ProductAdapter(getContext(), products, product -> {
-                        // TODO: xử lý khi nhấn vào sản phẩm
+                        Bundle bundle = new Bundle();
+                        bundle.putString("productId", product.getId());
+                        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                        navController.navigate(R.id.productDetailFragment, bundle);
                     });
+
 
                     recyclerProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
                     recyclerProducts.setAdapter(productAdapter);
