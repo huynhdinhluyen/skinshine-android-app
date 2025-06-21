@@ -23,15 +23,18 @@
             android:drawablePadding="8dp"
             android:hint="Tìm kiếm sản phẩm"
             android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@android:color/black"
+            android:textColorHint="#888888"
+            android:textSize="14sp"
             android:inputType="text" />
 
-        <ImageView
-            android:id="@+id/iconCart"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+        <include
+            layout="@layout/cart_badge_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:src="@drawable/outline_add_shopping_cart_24"
-            android:contentDescription="Giỏ hàng" />
+            android:id="@+id/cartBadgeContainer" />
     </LinearLayout>
 
     <!-- Tabs Danh mục / Thương hiệu -->

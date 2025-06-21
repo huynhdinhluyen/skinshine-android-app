@@ -18,6 +18,22 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
+        android:id="@+id/navigation_cart"
+        android:name="com.example.skinshine.ui.cart.CartFragment"
+        android:label="Giỏ hàng"
+        tools:layout="@layout/fragment_cart">
+        <action
+            android:id="@+id/action_navigation_cart_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+<!--    <fragment-->
+<!--        android:id="@+id/navigation_order_history"-->
+<!--        android:name="com.example.skinshine.ui.orderhistory.OrderHistoryFragment"-->
+<!--        android:label="Lịch sử đơn hàng"-->
+<!--        tools:layout="@layout/fragment_order_history" />-->
+
+    <fragment
         android:id="@+id/navigation_category"
         android:name="com.example.skinshine.ui.category.CategoryFragment"
         android:label="Danh mục"
