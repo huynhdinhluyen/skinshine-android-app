@@ -1,12 +1,17 @@
 package com.example.skinshine.ui.home;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +26,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
 import com.example.skinshine.databinding.FragmentHomeBinding;
+import com.example.skinshine.ui.cart.CartViewModel;
+import com.example.skinshine.ui.login.LoginActivity;
 import com.example.skinshine.utils.CartBadgeHelper;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -33,11 +41,15 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private BannerAdapter bannerAdapter;
     private ProductAdapter productAdapter;
+    private CartViewModel cartViewModel;
     private Timer bannerTimer;
     private final Handler bannerHandler = new Handler(Looper.getMainLooper());
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState
+    ) {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -46,6 +58,7 @@ public class HomeFragment extends Fragment {
         setupBannerViewPager();
         setupProductRecyclerView();
         observeViewModel();
+        cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
 
         return root;
     }
@@ -69,7 +82,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void onProductClicked(Product product) {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        NavController navController = Navigation.findNavController(
+                requireActivity(),
+                R.id.nav_host_fragment_activity_main
+        );
         Bundle bundle = new Bundle();
         bundle.putString("productId", product.getId());
         navController.navigate(R.id.productDetailFragment, bundle);
@@ -83,7 +99,6 @@ public class HomeFragment extends Fragment {
                 bannerAdapter.updateBanners(banners);
                 startBannerAutoSlide(banners.size());
             }
-            // Ẩn ProgressBar khi cả hai đều đã tải xong hoặc có lỗi
             if (homeViewModel.getProducts().getValue() != null || banners == null) {
                 checkAndHideProgressBar();
             }
@@ -93,14 +108,12 @@ public class HomeFragment extends Fragment {
             if (products != null) {
                 productAdapter.updateProducts(products);
             }
-            // Ẩn ProgressBar khi cả hai đều đã tải xong hoặc có lỗi
             if (homeViewModel.getBanners().getValue() != null || products == null) {
                 checkAndHideProgressBar();
             }
         });
     }
     private void checkAndHideProgressBar() {
-        // Chỉ ẩn ProgressBar nếu cả banner và product đều đã có dữ liệu (hoặc null nếu lỗi)
         boolean bannersLoadedOrFailed = homeViewModel.getBanners().getValue() != null || (homeViewModel.getBanners().getValue() == null && bannerAdapter.getItemCount() == 0);
         boolean productsLoadedOrFailed = homeViewModel.getProducts().getValue() != null || (homeViewModel.getProducts().getValue() == null && productAdapter.getItemCount() == 0);
 
@@ -141,14 +154,46 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
-        ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+        if (cartBadgeContainer != null) {
+            TextView cartBadge = cartBadgeContainer.findViewById(R.id.cartBadge);
+            cartViewModel.getCartItemCount().observe(getViewLifecycleOwner(), count -> {
+                if (count != null && count > 0) {
+                    cartBadge.setVisibility(View.VISIBLE);
+                    cartBadge.setText(String.valueOf(count));
+                } else {
+                    cartBadge.setVisibility(View.GONE);
+                }
+            });
 
-        iconCart.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.navigation_cart);
-        });
+            ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+            if (iconCart != null) {
+                iconCart.setOnClickListener(v -> {
+                    if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                        Toast.makeText(getContext(), "Vui lòng đăng nhập để xem giỏ hàng", Toast.LENGTH_SHORT).show();
 
-        CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+                        try {
+                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                            navController.navigate(R.id.action_homeFragment_to_loginFragment);
+                        } catch (Exception e) {
+                            Log.e("HomeFragment", "Error navigating to login: " + e.getMessage(), e);
+                            try {
+                                Intent intent = new Intent(getActivity(), com.example.skinshine.ui.login.LoginActivity.class);
+                                startActivity(intent);
+                            } catch (Exception ex) {
+                                Log.e("HomeFragment", "Fallback failed: " + ex.getMessage(), ex);
+                            }
+                        }
+                    } else {
+                        try {
+                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                            navController.navigate(R.id.cartFragment);
+                        } catch (Exception e) {
+                            Log.e("HomeFragment", "Error navigating to cart: " + e.getMessage(), e);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     @Override
