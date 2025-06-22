@@ -1,10 +1,14 @@
 package com.example.skinshine.ui.product;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -13,15 +17,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.skinshine.MainActivity;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
+import com.example.skinshine.ui.cart.CartViewModel;
+import com.example.skinshine.ui.login.LoginActivity;
+import com.example.skinshine.ui.login.LoginFragment;
+import com.example.skinshine.utils.CartBadgeHelper;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
@@ -36,11 +45,15 @@ public class ProductDetailFragment extends Fragment {
     private TextView textName, textBrand, textPrice, textDescription, textIngredients, textCategory, textSkinTypes;
     private RatingBar ratingBar;
     private Product currentProduct;
+    private CartViewModel cartViewModel;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_product_detail, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState
+    ) {
+        View view = inflater.inflate(R.layout.activity_product_detail, container, false);
 
         imageProduct = view.findViewById(R.id.imageProduct);
         textName = view.findViewById(R.id.textName);
@@ -77,7 +90,7 @@ public class ProductDetailFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
         }
-
+        cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
         return view;
     }
 
@@ -147,7 +160,7 @@ public class ProductDetailFragment extends Fragment {
 
     private void showAddToCartBottomSheet(Product product) {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.bottom_cart, null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_bottom_cart, null);
         dialog.setContentView(view);
 
         ImageView img = view.findViewById(R.id.imageProduct);
@@ -184,40 +197,67 @@ public class ProductDetailFragment extends Fragment {
         });
 
         btnConfirm.setOnClickListener(v -> {
-            // Kiểm tra đăng nhập
-            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                Toast.makeText(getContext(), "Vui lòng đăng nhập để thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            // DEBUG: Log trạng thái Firebase Auth
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            Log.d("DEBUG_AUTH", "Current user: " + (auth.getCurrentUser() != null ? auth.getCurrentUser().getEmail() : "NULL"));
+            Log.d("DEBUG_AUTH", "Auth state: " + auth.getUid());
 
-                // Nếu dùng Fragment:
-                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-                navController.navigate(R.id.action_productDetailFragment_to_loginFragment);
-
+            if (auth.getCurrentUser() == null) {
+                Log.e("DEBUG_AUTH", "User is null - redirecting to login");
+                Toast.makeText(getContext(), "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
+
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
                 return;
             }
 
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            // DEBUG: Log thông tin user
+            String userId = auth.getCurrentUser().getUid();
+            Log.d("DEBUG_AUTH", "User ID: " + userId);
+            Log.d("DEBUG_CART", "Adding product: " + product.getName() + " (ID: " + product.getId() + ")");
 
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
             String cartPath = "users/" + userId + "/cartItems";
             String productId = product.getId();
+
+            // Validate product ID
+            if (productId == null || productId.isEmpty()) {
+                Log.e("DEBUG_CART", "Product ID is null or empty");
+                Toast.makeText(getContext(), "Lỗi: Không tìm thấy ID sản phẩm", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Log.d("DEBUG_CART", "Cart path: " + cartPath);
+            Log.d("DEBUG_CART", "Product ID: " + productId);
 
             db.collection(cartPath)
                     .document(productId)
                     .get()
                     .addOnSuccessListener(doc -> {
+                        Log.d("DEBUG_CART", "Document exists: " + doc.exists());
+
                         if (doc.exists()) {
                             long currentQuantity = doc.getLong("quantity") != null ? doc.getLong("quantity") : 0;
                             long newQuantity = currentQuantity + quantity[0];
+
+                            Log.d("DEBUG_CART", "Updating quantity from " + currentQuantity + " to " + newQuantity);
 
                             db.collection(cartPath)
                                     .document(productId)
                                     .update("quantity", newQuantity)
                                     .addOnSuccessListener(aVoid -> {
+                                        Log.d("DEBUG_CART", "Successfully updated cart item");
                                         Toast.makeText(getContext(), "Cập nhật giỏ hàng thành công", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("DEBUG_CART", "Failed to update cart item", e);
+                                        Toast.makeText(getContext(), "Lỗi khi cập nhật giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         } else {
+                            Log.d("DEBUG_CART", "Creating new cart item");
+
                             HashMap<String, Object> data = new HashMap<>();
                             data.put("productId", productId);
                             data.put("productName", product.getName());
@@ -225,18 +265,89 @@ public class ProductDetailFragment extends Fragment {
                             data.put("price", product.getPrice());
                             data.put("quantity", quantity[0]);
 
+                            Log.d("DEBUG_CART", "Cart data: " + data.toString());
+
                             db.collection(cartPath)
                                     .document(productId)
                                     .set(data)
                                     .addOnSuccessListener(aVoid -> {
+                                        Log.d("DEBUG_CART", "Successfully added new cart item");
                                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                                         dialog.dismiss();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("DEBUG_CART", "Failed to add new cart item", e);
+                                        Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("DEBUG_CART", "Failed to check cart item", e);
+                        Toast.makeText(getContext(), "Lỗi khi kiểm tra giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
 
-
         dialog.show();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
+        if (cartBadgeContainer != null) {
+            TextView cartBadge = cartBadgeContainer.findViewById(R.id.cartBadge);
+            cartViewModel.getCartItemCount().observe(getViewLifecycleOwner(), count -> {
+                if (count != null && count > 0) {
+                    cartBadge.setVisibility(View.VISIBLE);
+                    cartBadge.setText(String.valueOf(count));
+                } else {
+                    cartBadge.setVisibility(View.GONE);
+                }
+            });
+            ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+            if (iconCart != null) {
+                iconCart.setOnClickListener(v -> {
+                    if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                        Toast.makeText(getContext(), "Vui lòng đăng nhập để xem giỏ hàng", Toast.LENGTH_SHORT).show();
+                        try {
+                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                            navController.navigate(R.id.action_productDetailFragment_to_loginFragment);
+                        } catch (Exception e) {
+                            Log.e("ProductDetail", "Error navigating to login: " + e.getMessage(), e);
+                            try {
+                                Intent intent = new Intent(getActivity(), com.example.skinshine.ui.login.LoginActivity.class);
+                                startActivity(intent);
+                            } catch (Exception ex) {
+                                Log.e("ProductDetail", "Fallback failed: " + ex.getMessage(), ex);
+                            }
+                        }
+                    } else {
+                        try {
+                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                            navController.navigate(R.id.cartFragment);
+                        } catch (Exception e) {
+                            Log.e("ProductDetail", "Error navigating to cart: " + e.getMessage(), e);
+                        }
+                    }
+                });
+            }
+        }
+
+        EditText searchInput = view.findViewById(R.id.searchInput);
+        if (searchInput != null) {
+            searchInput.setOnEditorActionListener((v, actionId, event) -> {
+                return false;
+            });
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        View cartBadgeContainer = getView() != null ? getView().findViewById(R.id.cartBadgeContainer) : null;
+        if (cartBadgeContainer != null) {
+            CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+        }
     }
 }
