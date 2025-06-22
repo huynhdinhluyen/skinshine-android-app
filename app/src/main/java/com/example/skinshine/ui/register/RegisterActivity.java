@@ -1,18 +1,16 @@
 package com.example.skinshine.ui.register;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.skinshine.R;
+import com.example.skinshine.ui.login.LoginActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,30 +20,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterFragment extends Fragment {
+public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
-    public RegisterFragment() {
-        super(R.layout.activity_register);
-    }
-
-    public boolean isValidPhoneNumber(String phone) {
-        return phone.matches("^0[3|5|7|8|9][0-9]{8}$");
-    }
-
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
 
-        EditText edtFullName = view.findViewById(R.id.edtFullName);
-        EditText edtUsername = view.findViewById(R.id.edtUsername);
-        EditText edtPhone = view.findViewById(R.id.edtPhone);
-        TextInputEditText edtPassword = view.findViewById(R.id.edtPassword);
-        TextInputEditText edtConfirmPassword = view.findViewById(R.id.edtConfirmPassword);
-        Button btnRegisterConfirm = view.findViewById(R.id.btnRegisterConfirm);
-        TextView tvGoToLogin = view.findViewById(R.id.tvGoToLogin);
+        EditText edtFullName = findViewById(R.id.edtFullName);
+        EditText edtUsername = findViewById(R.id.edtUsername);
+        EditText edtPhone = findViewById(R.id.edtPhone);
+        TextInputEditText edtPassword = findViewById(R.id.edtPassword);
+        TextInputEditText edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
+        Button btnRegisterConfirm = findViewById(R.id.btnRegisterConfirm);
+        TextView tvGoToLogin = findViewById(R.id.tvGoToLogin);
 
         btnRegisterConfirm.setOnClickListener(v -> {
             String fullName = edtFullName.getText().toString().trim();
@@ -55,17 +46,12 @@ public class RegisterFragment extends Fragment {
             String confirm = edtConfirmPassword.getText().toString().trim();
 
             if (fullName.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
-                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!isValidPhoneNumber(phone)) {
-                Toast.makeText(getContext(), "Số điện thoại không hợp lệ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!password.equals(confirm)) {
-                Toast.makeText(getContext(), "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -89,25 +75,27 @@ public class RegisterFragment extends Fragment {
                                                 db.collection("users").document(user.getUid())
                                                         .set(userData)
                                                         .addOnSuccessListener(aVoid -> {
-                                                            Toast.makeText(getContext(), "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                                                            Navigation.findNavController(v).navigate(R.id.action_registerFragment_to_loginFragment);
+                                                            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(this, LoginActivity.class);
+                                                            startActivity(intent);
+                                                            finish();
                                                         })
                                                         .addOnFailureListener(e -> {
-                                                            Toast.makeText(getContext(), "Lỗi khi lưu dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(this, "Lỗi khi lưu dữ liệu người dùng", Toast.LENGTH_SHORT).show();
                                                         });
-                                            } else {
-                                                Toast.makeText(getContext(), "Lỗi khi cập nhật tên người dùng", Toast.LENGTH_SHORT).show();
                                             }
                                         });
                             }
                         } else {
-                            Toast.makeText(getContext(), "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
         });
 
         tvGoToLogin.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_registerFragment_to_loginFragment);
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 }

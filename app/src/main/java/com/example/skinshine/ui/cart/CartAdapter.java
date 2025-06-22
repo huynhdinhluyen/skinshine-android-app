@@ -20,16 +20,16 @@ import java.util.Locale;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
-    private final List<CartItem> cartItems;
-    private final OnCartActionListener listener;
+    private List<CartItem> cartItems;
+    private CartItemListener listener;
 
-    public interface OnCartActionListener {
+    public interface CartItemListener {
         void onQuantityChanged(CartItem item, int newQuantity);
         void onDeleteItem(CartItem item);
         void onItemSelected(CartItem item, boolean isSelected);
     }
 
-    public CartAdapter(List<CartItem> cartItems, OnCartActionListener listener) {
+    public CartAdapter(List<CartItem> cartItems, CartItemListener listener) {
         this.cartItems = cartItems;
         this.listener = listener;
     }
@@ -44,41 +44,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItem item = cartItems.get(position);
-
-        holder.textName.setText(item.getProductName());
-        holder.textPrice.setText(NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(item.getPrice()));
-        holder.textQuantity.setText(String.valueOf(item.getQuantity()));
-        holder.checkBox.setChecked(item.isSelected());
-
-        Glide.with(holder.itemView.getContext())
-                .load(item.getImageUrl())
-                .placeholder(R.drawable.ic_placeholder)
-                .into(holder.imageProduct);
-
-        holder.checkBox.setOnCheckedChangeListener(null);
-        holder.checkBox.setChecked(item.isSelected());
-        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            item.setSelected(isChecked);
-            listener.onItemSelected(item, isChecked);
-        });
-
-        holder.btnPlus.setOnClickListener(v -> {
-            int newQuantity = item.getQuantity() + 1;
-            item.setQuantity(newQuantity);
-            holder.textQuantity.setText(String.valueOf(newQuantity));
-            listener.onQuantityChanged(item, newQuantity);
-        });
-
-        holder.btnMinus.setOnClickListener(v -> {
-            if (item.getQuantity() > 1) {
-                int newQuantity = item.getQuantity() - 1;
-                item.setQuantity(newQuantity);
-                holder.textQuantity.setText(String.valueOf(newQuantity));
-                listener.onQuantityChanged(item, newQuantity);
-            }
-        });
-
-        holder.btnDelete.setOnClickListener(v -> listener.onDeleteItem(item));
+        holder.bind(item);
     }
 
     @Override
@@ -86,22 +52,75 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return cartItems.size();
     }
 
-    static class CartViewHolder extends RecyclerView.ViewHolder {
-        CheckBox checkBox;
-        ImageView imageProduct;
-        TextView textName, textPrice, textQuantity;
-        ImageView btnPlus, btnMinus, btnDelete;
+    class CartViewHolder extends RecyclerView.ViewHolder {
+        private CheckBox checkboxSelect;
+        private ImageView imageProduct;
+        private TextView textProductName;
+        private TextView textPrice;
+        private TextView textQuantity;
+        private ImageView btnMinus;
+        private ImageView btnPlus;
+        private ImageView btnDelete;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
-            checkBox = itemView.findViewById(R.id.checkBoxSelect);
+            checkboxSelect = itemView.findViewById(R.id.checkboxSelect);
             imageProduct = itemView.findViewById(R.id.imageProduct);
-            textName = itemView.findViewById(R.id.textProductName);
+            textProductName = itemView.findViewById(R.id.textProductName);
             textPrice = itemView.findViewById(R.id.textPrice);
             textQuantity = itemView.findViewById(R.id.textQuantity);
-            btnPlus = itemView.findViewById(R.id.btnPlus);
             btnMinus = itemView.findViewById(R.id.btnMinus);
+            btnPlus = itemView.findViewById(R.id.btnPlus);
             btnDelete = itemView.findViewById(R.id.btnDelete);
+        }
+
+        public void bind(CartItem item) {
+            textProductName.setText(item.getProductName());
+            textPrice.setText(NumberFormat.getCurrencyInstance(new Locale("vi", "VN")).format(item.getPrice()));
+            textQuantity.setText(String.valueOf(item.getQuantity()));
+            checkboxSelect.setChecked(item.isSelected());
+
+            // Load image with Glide
+            Glide.with(itemView.getContext())
+                    .load(item.getImageUrl())
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.placeholder_image)
+                    .into(imageProduct);
+
+            // Checkbox listener
+            checkboxSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (listener != null) {
+                    listener.onItemSelected(item, isChecked);
+                }
+            });
+
+            // Quantity controls
+            btnMinus.setOnClickListener(v -> {
+                if (item.getQuantity() > 1) {
+                    int newQuantity = item.getQuantity() - 1;
+                    item.setQuantity(newQuantity);
+                    textQuantity.setText(String.valueOf(newQuantity));
+                    if (listener != null) {
+                        listener.onQuantityChanged(item, newQuantity);
+                    }
+                }
+            });
+
+            btnPlus.setOnClickListener(v -> {
+                int newQuantity = item.getQuantity() + 1;
+                item.setQuantity(newQuantity);
+                textQuantity.setText(String.valueOf(newQuantity));
+                if (listener != null) {
+                    listener.onQuantityChanged(item, newQuantity);
+                }
+            });
+
+            // Delete button
+            btnDelete.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteItem(item);
+                }
+            });
         }
     }
 }

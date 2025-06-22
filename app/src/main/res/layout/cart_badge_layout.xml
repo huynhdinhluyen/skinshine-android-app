@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <ImageView
         android:id="@+id/iconCart"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:src="@drawable/outline_add_shopping_cart_24"
         android:contentDescription="Giỏ hàng" />
 
     <TextView
         android:id="@+id/cartBadge"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="16dp"
+        android:minHeight="16dp"
         android:layout_gravity="top|end"
-        android:layout_marginTop="-6dp"
-        android:layout_marginEnd="-6dp"
+        android:layout_marginTop="-4dp"
+        android:layout_marginEnd="-4dp"
+        android:padding="2dp"
         android:background="@drawable/cart_badge_bg"
         android:gravity="center"
         android:text="0"
