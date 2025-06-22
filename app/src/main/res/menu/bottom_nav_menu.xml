@@ -11,9 +11,9 @@
         android:title="Danh mục" />
 
     <item
-        android:id="@+id/navigation_cart"
-        android:icon="@drawable/ic_cart"
-        android:title="Giỏ hàng" />
+        android:id="@+id/navigation_quiz"
+        android:icon="@drawable/ic_quiz"
+        android:title="Quiz" />
 
     <item
         android:id="@+id/navigation_order_history"
