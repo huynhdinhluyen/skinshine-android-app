@@ -1,6 +1,8 @@
 package com.example.skinshine.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -10,12 +12,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.skinshine.R;
+import com.example.skinshine.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -100,8 +102,13 @@ public class ProfileFragment extends Fragment {
         }
 
         btnLogin.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_profileFragment_to_loginFragment);
+            try {
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e("ProfileFragment", "Error starting LoginActivity", e);
+                Toast.makeText(getContext(), "Không thể mở màn hình đăng nhập", Toast.LENGTH_SHORT).show();
+            }
         });
 
         btnLogout.setOnClickListener(v -> {

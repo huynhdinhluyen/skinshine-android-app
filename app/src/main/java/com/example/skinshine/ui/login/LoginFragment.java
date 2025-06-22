@@ -3,7 +3,6 @@ package com.example.skinshine.ui.login;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +13,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.skinshine.R;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -21,7 +21,7 @@ public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     public LoginFragment() {
-        super(R.layout.fragment_login);
+        super(R.layout.activity_login);
     }
 
     @Override
@@ -30,8 +30,8 @@ public class LoginFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
 
-        EditText edtUsername = view.findViewById(R.id.edtUsername);
-        EditText edtPassword = view.findViewById(R.id.edtPassword);
+        TextInputEditText edtUsername = view.findViewById(R.id.edtUsername);
+        TextInputEditText edtPassword = view.findViewById(R.id.edtPassword);
         Button btnLoginConfirm = view.findViewById(R.id.btnLoginConfirm);
         Button btnRegister = view.findViewById(R.id.btnRegister);
         TextView tvBackHome = view.findViewById(R.id.tvBackHome);
@@ -56,9 +56,12 @@ public class LoginFragment extends Fragment {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
-                             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_homeFragment);
+                            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_homeFragment);
                         } else {
-                            Toast.makeText(getContext(), "Đăng nhập thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(
+                                    getContext(),
+                                    "Đăng nhập thất bại: " + task.getException().getMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
         });
