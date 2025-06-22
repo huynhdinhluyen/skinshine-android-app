@@ -13,6 +13,7 @@
         android:text="Chọn Sản Phẩm"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="#2E2E2E"
         android:gravity="center" />
 
     <!-- Product Info -->
@@ -42,13 +43,14 @@
                 android:layout_height="wrap_content"
                 android:text="Tên sản phẩm"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:textColor="#2E2E2E" />
 
             <TextView
                 android:id="@+id/textDiscountedPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#D32F2F"
+                android:textStyle="bold"
                 android:text="148,000đ" />
 
             <TextView
@@ -67,6 +69,7 @@
         android:layout_height="wrap_content"
         android:text="Số lượng:"
         android:textStyle="bold"
+        android:textColor="#2E2E2E"
         android:layout_marginTop="20dp" />
 
     <LinearLayout
@@ -80,7 +83,9 @@
             android:id="@+id/btnMinus"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="-" />
+            android:text="-"
+            android:textColor="#2E2E2E"
+            android:backgroundTint="#E0E0E0" />
 
         <TextView
             android:id="@+id/textQuantity"
@@ -88,13 +93,17 @@
             android:layout_height="40dp"
             android:text="1"
             android:gravity="center"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#2E2E2E"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnPlus"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="+" />
+            android:text="+"
+            android:textColor="#2E2E2E"
+            android:backgroundTint="#E0E0E0" />
     </LinearLayout>
 
     <!-- Total Price -->
@@ -105,6 +114,7 @@
         android:text="Tổng tiền: 148,000đ"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:textColor="#2E2E2E"
         android:layout_marginTop="20dp" />
 
     <!-- Add to Cart Button -->
