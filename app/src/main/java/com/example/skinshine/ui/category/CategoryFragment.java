@@ -22,7 +22,7 @@ public class CategoryFragment extends Fragment {
     private FrameLayout contentContainer;
 
     public CategoryFragment() {
-        super(R.layout.fragment_category);
+        super(R.layout.activity_category);
     }
 
     @Override
@@ -31,10 +31,16 @@ public class CategoryFragment extends Fragment {
 
         View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
         ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+        tabCategory = view.findViewById(R.id.tabCategory);
+        tabBrand = view.findViewById(R.id.tabBrand);
+        contentContainer = view.findViewById(R.id.contentContainer);
+        showCategoryContent();
+        tabCategory.setOnClickListener(v -> showCategoryContent());
+        tabBrand.setOnClickListener(v -> showBrandContent());
 
         iconCart.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.navigation_cart);
+            navController.navigate(R.id.cartFragment);
         });
 
         CartBadgeHelper.updateCartBadge(cartBadgeContainer);

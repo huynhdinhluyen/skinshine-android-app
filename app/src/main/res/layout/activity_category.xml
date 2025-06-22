@@ -5,37 +5,10 @@
     android:background="#FFF8F2">
 
     <!-- Ô search + giỏ hàng -->
-    <LinearLayout
+    <include
+        layout="@layout/fragment_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="?attr/colorPrimary"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:id="@+id/searchInput"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="40dp"
-            android:background="@drawable/search_box_bg"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="8dp"
-            android:hint="Tìm kiếm sản phẩm"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:textColor="@android:color/black"
-            android:textColorHint="#888888"
-            android:textSize="14sp"
-            android:inputType="text" />
-
-        <include
-            layout="@layout/cart_badge_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:id="@+id/cartBadgeContainer" />
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
     <!-- Tabs Danh mục / Thương hiệu -->
     <LinearLayout
