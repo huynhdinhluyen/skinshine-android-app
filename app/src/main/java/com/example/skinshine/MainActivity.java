@@ -6,6 +6,7 @@ import android.view.View;
 import com.example.skinshine.ui.cart.CartViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -75,12 +76,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupAuthStateListener() {
-        authStateListener = firebaseAuth -> {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                cartViewModel.attachCartListener();
-            } else {
-                cartViewModel.detachCartListener();
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                // Handle auth state changes if needed
+                // Note: Removed the nonexistent methods calls
             }
         };
     }
@@ -88,7 +89,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(authStateListener);
+        if (authStateListener != null) {
+            mAuth.addAuthStateListener(authStateListener);
+        }
     }
 
     @Override
@@ -102,5 +105,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Any resume logic here
     }
 }

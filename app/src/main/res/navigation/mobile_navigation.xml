@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_productDetailFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_productDetailFragment_to_productComparisonFragment"
+            app:destination="@id/productComparisonFragment" />
     </fragment>
 
     <fragment
@@ -93,4 +96,9 @@
             android:id="@+id/action_cartFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/productComparisonFragment"
+        android:name="com.example.skinshine.ui.product.ProductComparisonFragment"
+        android:label="So sánh sản phẩm"
+        tools:layout="@layout/fragment_product_comparison" />
 </navigation>
