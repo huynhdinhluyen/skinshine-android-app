@@ -245,27 +245,40 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
+            android:id="@+id/btnCompare"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🔄 So sánh"
+            android:backgroundTint="#2196F3"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginEnd="4dp" />
+
+        <!-- Cập nhật lại các button khác để có 3 button cân bằng -->
+        <Button
             android:id="@+id/btnAddToCart"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="🛒 Thêm vào giỏ"
+            android:text="🛒 Thêm"
             android:backgroundTint="#FF9800"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="14sp"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginHorizontal="2dp" />
 
         <Button
             android:id="@+id/btnBuyNow"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="💳 Mua ngay"
+            android:text="💳 Mua"
             android:backgroundTint="#E91E63"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:textSize="14sp"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="4dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

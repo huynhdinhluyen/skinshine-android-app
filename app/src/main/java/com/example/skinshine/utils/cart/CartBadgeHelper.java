@@ -1,4 +1,4 @@
-package com.example.skinshine.utils;
+package com.example.skinshine.utils.cart;
 
 import android.view.View;
 import android.widget.TextView;

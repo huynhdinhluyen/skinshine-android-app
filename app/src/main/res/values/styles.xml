@@ -12,4 +12,11 @@
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColorPrimary">#2E2E2E</item>
+    </style>
 </resources>

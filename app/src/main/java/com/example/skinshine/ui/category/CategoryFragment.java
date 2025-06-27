@@ -14,7 +14,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.skinshine.R;
-import com.example.skinshine.utils.CartBadgeHelper;
+import com.example.skinshine.utils.cart.CartBadgeHelper;
 
 public class CategoryFragment extends Fragment {
 

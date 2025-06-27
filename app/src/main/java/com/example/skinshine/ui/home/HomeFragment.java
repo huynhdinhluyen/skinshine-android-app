@@ -1,7 +1,5 @@
 package com.example.skinshine.ui.home;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,16 +21,18 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.skinshine.R;
+import com.example.skinshine.data.model.BannerItem;
 import com.example.skinshine.data.model.Product;
+import com.example.skinshine.data.model.Result;
 import com.example.skinshine.databinding.FragmentHomeBinding;
 import com.example.skinshine.ui.cart.CartViewModel;
-import com.example.skinshine.ui.login.LoginActivity;
-import com.example.skinshine.utils.CartBadgeHelper;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.skinshine.utils.cart.CartBadgeHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,17 +40,17 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private HomeViewModel homeViewModel;
-    private BannerAdapter bannerAdapter;
-    private ProductAdapter productAdapter;
     private CartViewModel cartViewModel;
+    private ProductAdapter productAdapter;
+    private BannerAdapter bannerAdapter;
+    private RecyclerView recyclerViewProducts;
+    private ProgressBar progressBar;
+    private TextView errorTextView;
     private Timer bannerTimer;
     private final Handler bannerHandler = new Handler(Looper.getMainLooper());
 
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -57,17 +58,62 @@ public class HomeFragment extends Fragment {
         setupToolbar();
         setupBannerViewPager();
         setupProductRecyclerView();
-        observeViewModel();
-        cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);
+        setupViewModels();
+        setupRecyclerView();
+        setupCartBadge(view);
+        observeViewModel();
+    }
+
+    private void initViews(View view) {
+        recyclerViewProducts = view.findViewById(R.id.recyclerViewProducts);
+        progressBar = view.findViewById(R.id.progressBarHome);
+        // Add error TextView to your layout if not exists
+        // errorTextView = view.findViewById(R.id.textViewError);
+    }
+
+    private void setupViewModels() {
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
+    }
+
+    private void setupRecyclerView() {
+        productAdapter = new ProductAdapter(getContext(), new ArrayList<>(), this::navigateToProductDetail);
+        recyclerViewProducts.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerViewProducts.setAdapter(productAdapter);
+    }
+
+    private void setupCartBadge(View view) {
+        View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
+        if (cartBadgeContainer != null) {
+            TextView cartBadge = cartBadgeContainer.findViewById(R.id.cartBadge);
+
+            cartViewModel.getCartItemCount().observe(getViewLifecycleOwner(), count -> {
+                if (count != null && count > 0) {
+                    cartBadge.setVisibility(View.VISIBLE);
+                    cartBadge.setText(String.valueOf(count));
+                } else {
+                    cartBadge.setVisibility(View.GONE);
+                }
+            });
+
+            ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
+            iconCart.setOnClickListener(v -> navigateToCart());
+        }
     }
 
     private void setupToolbar() {
         Toolbar toolbar = binding.toolbarHome;
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
     }
-
 
     private void setupBannerViewPager() {
         bannerAdapter = new BannerAdapter(getContext(), new ArrayList<>());
@@ -92,41 +138,112 @@ public class HomeFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        binding.progressBarHome.setVisibility(View.VISIBLE);
+        // Observe banners
+        homeViewModel.getBanners().observe(getViewLifecycleOwner(), this::handleBannerResult);
 
-        homeViewModel.getBanners().observe(getViewLifecycleOwner(), banners -> {
-            if (banners != null && !banners.isEmpty()) {
-                bannerAdapter.updateBanners(banners);
-                startBannerAutoSlide(banners.size());
-            }
-            if (homeViewModel.getProducts().getValue() != null || banners == null) {
-                checkAndHideProgressBar();
+        // Observe products với Result wrapper
+        homeViewModel.getProducts().observe(getViewLifecycleOwner(), result -> {
+            if (result != null) {
+                if (result.isSuccess() && result.getData() != null) {
+                    productAdapter.updateProducts(result.getData());
+                    showContent();
+                } else if (result.isError()) {
+                    showError(result.getMessage());
+                } else if (result.isLoading()) {
+                    showLoading();
+                }
             }
         });
 
-        homeViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
-            if (products != null) {
-                productAdapter.updateProducts(products);
+        // Observe loading state
+        homeViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (Boolean.TRUE.equals(isLoading)) {
+                showLoading();
             }
-            if (homeViewModel.getBanners().getValue() != null || products == null) {
-                checkAndHideProgressBar();
+        });
+
+        homeViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                showError(error);
             }
         });
     }
-    private void checkAndHideProgressBar() {
-        boolean bannersLoadedOrFailed = homeViewModel.getBanners().getValue() != null || (homeViewModel.getBanners().getValue() == null && bannerAdapter.getItemCount() == 0);
-        boolean productsLoadedOrFailed = homeViewModel.getProducts().getValue() != null || (homeViewModel.getProducts().getValue() == null && productAdapter.getItemCount() == 0);
 
-        if (bannersLoadedOrFailed && productsLoadedOrFailed) {
-            binding.progressBarHome.setVisibility(View.GONE);
+    private void handleBannerResult(Result<List<BannerItem>> result) {
+        if (result != null) {
+            if (result.isSuccess() && result.getData() != null) {
+                List<BannerItem> banners = result.getData();
+                bannerAdapter.updateBanners(banners);
+
+                if (banners.size() > 1) {
+                    startBannerAutoSlide(banners.size());
+                }
+
+                Log.d("HomeFragment", "Banners loaded: " + banners.size());
+            } else if (result.isError()) {
+                Log.e("HomeFragment", "Banner error: " + result.getMessage());
+                binding.viewPagerBanner.setVisibility(View.GONE);
+            } else if (result.isLoading()) {
+                Log.d("HomeFragment", "Loading banners...");
+            }
         }
     }
 
+    private void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewProducts.setVisibility(View.GONE);
+        if (errorTextView != null) {
+            errorTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void showContent() {
+        progressBar.setVisibility(View.GONE);
+        recyclerViewProducts.setVisibility(View.VISIBLE);
+        binding.viewPagerBanner.setVisibility(View.VISIBLE); // Show banner
+        if (errorTextView != null) {
+            errorTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void showError(String message) {
+        progressBar.setVisibility(View.GONE);
+        recyclerViewProducts.setVisibility(View.GONE);
+
+        if (errorTextView != null) {
+            errorTextView.setVisibility(View.VISIBLE);
+            errorTextView.setText(message);
+        } else {
+            Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navigateToProductDetail(Product product) {
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString("productId", product.getId());
+
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.productDetailFragment, bundle);
+        } catch (Exception e) {
+            Log.e("HomeFragment", "Error navigating to product detail", e);
+            Toast.makeText(getContext(), "Không thể mở chi tiết sản phẩm", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navigateToCart() {
+        try {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.cartFragment);
+        } catch (Exception e) {
+            Log.e("HomeFragment", "Error navigating to cart", e);
+        }
+    }
 
     private void startBannerAutoSlide(int numberOfBanners) {
         if (numberOfBanners <= 1) return;
 
-        stopBannerAutoSlide(); 
+        stopBannerAutoSlide();
         bannerTimer = new Timer();
         long BANNER_SLIDE_DELAY = 3000;
         long BANNER_SLIDE_PERIOD = 5000;
@@ -134,9 +251,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void run() {
                 bannerHandler.post(() -> {
-                    int currentItem = binding.viewPagerBanner.getCurrentItem();
-                    int nextItem = (currentItem + 1) % numberOfBanners;
-                    binding.viewPagerBanner.setCurrentItem(nextItem, true);
+                    if (binding != null) {
+                        int currentItem = binding.viewPagerBanner.getCurrentItem();
+                        int nextItem = (currentItem + 1) % numberOfBanners;
+                        binding.viewPagerBanner.setCurrentItem(nextItem, true);
+                    }
                 });
             }
         }, BANNER_SLIDE_DELAY, BANNER_SLIDE_PERIOD);
@@ -150,58 +269,13 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
-        if (cartBadgeContainer != null) {
-            TextView cartBadge = cartBadgeContainer.findViewById(R.id.cartBadge);
-            cartViewModel.getCartItemCount().observe(getViewLifecycleOwner(), count -> {
-                if (count != null && count > 0) {
-                    cartBadge.setVisibility(View.VISIBLE);
-                    cartBadge.setText(String.valueOf(count));
-                } else {
-                    cartBadge.setVisibility(View.GONE);
-                }
-            });
-
-            ImageView iconCart = cartBadgeContainer.findViewById(R.id.iconCart);
-            if (iconCart != null) {
-                iconCart.setOnClickListener(v -> {
-                    if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                        Toast.makeText(getContext(), "Vui lòng đăng nhập để xem giỏ hàng", Toast.LENGTH_SHORT).show();
-
-                        try {
-                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-                            navController.navigate(R.id.action_homeFragment_to_loginFragment);
-                        } catch (Exception e) {
-                            Log.e("HomeFragment", "Error navigating to login: " + e.getMessage(), e);
-                            try {
-                                Intent intent = new Intent(getActivity(), com.example.skinshine.ui.login.LoginActivity.class);
-                                startActivity(intent);
-                            } catch (Exception ex) {
-                                Log.e("HomeFragment", "Fallback failed: " + ex.getMessage(), ex);
-                            }
-                        }
-                    } else {
-                        try {
-                            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-                            navController.navigate(R.id.cartFragment);
-                        } catch (Exception e) {
-                            Log.e("HomeFragment", "Error navigating to cart: " + e.getMessage(), e);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        View cartBadgeContainer = getView().findViewById(R.id.cartBadgeContainer);
-        if (cartBadgeContainer != null) {
-            CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+        if (getView() != null) {
+            View cartBadgeContainer = getView().findViewById(R.id.cartBadgeContainer);
+            if (cartBadgeContainer != null) {
+                CartBadgeHelper.updateCartBadge(cartBadgeContainer);
+            }
         }
     }
 

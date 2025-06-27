@@ -53,4 +53,7 @@
     <!-- product detail -->
     <string name="product_image">Ảnh sản phẩm</string>
     <string name="app_logo">App Logo</string>
+    <string name="compare">So sánh</string>
+    <string name="product_name">Tên sản phẩm</string>
+    <string name="brand">Thương hiệu</string>
 </resources>
