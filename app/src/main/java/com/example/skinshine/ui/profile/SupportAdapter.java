@@ -10,44 +10,61 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.skinshine.R;
+import com.example.skinshine.data.model.SupportItem;
 
 import java.util.List;
 
 public class SupportAdapter extends RecyclerView.Adapter<SupportAdapter.SupportViewHolder> {
-    private final List<SupportItem> items;
+    private final List<SupportItem> supportItems;
+    private final OnSupportItemClickListener listener;
 
-    public SupportAdapter(List<SupportItem> items) {
-        this.items = items;
+    public SupportAdapter(List<SupportItem> supportItems, OnSupportItemClickListener listener) {
+        this.supportItems = supportItems;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public SupportViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
+        View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_support, parent, false);
-        return new SupportViewHolder(v);
+        return new SupportViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull SupportViewHolder holder, int position) {
-        SupportItem item = items.get(position);
-        holder.title.setText(item.title);
-        holder.icon.setImageResource(item.iconRes);
+        SupportItem item = supportItems.get(position);
+        holder.bind(item, listener);
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return supportItems.size();
     }
 
-    public static class SupportViewHolder extends RecyclerView.ViewHolder {
-        ImageView icon;
-        TextView title;
+    public interface OnSupportItemClickListener {
+        void onItemClick(SupportItem item);
+    }
+
+    static class SupportViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView iconImageView;
+        private final TextView titleTextView;
 
         public SupportViewHolder(@NonNull View itemView) {
             super(itemView);
-            icon = itemView.findViewById(R.id.imgIcon);
-            title = itemView.findViewById(R.id.txtTitle);
+            iconImageView = itemView.findViewById(R.id.iconSupport);
+            titleTextView = itemView.findViewById(R.id.textSupportTitle);
+        }
+
+        public void bind(SupportItem item, OnSupportItemClickListener listener) {
+            iconImageView.setImageResource(item.getIconRes());
+            titleTextView.setText(item.getTitle());
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClick(item);
+                }
+            });
         }
     }
 }

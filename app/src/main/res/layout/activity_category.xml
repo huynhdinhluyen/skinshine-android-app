@@ -1,46 +1,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FFF8F2">
+    android:background="#FFF8F2"
+    android:orientation="vertical">
 
     <!-- Ô search + giỏ hàng -->
-    <LinearLayout
+    <include
+        layout="@layout/fragment_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="?attr/colorPrimary"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:id="@+id/searchInput"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="40dp"
-            android:background="@drawable/search_box_bg"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="8dp"
-            android:hint="Tìm kiếm sản phẩm"
-            android:paddingStart="12dp"
-            android:inputType="text" />
-
-        <ImageView
-            android:id="@+id/iconCart"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/outline_add_shopping_cart_24"
-            android:contentDescription="Giỏ hàng" />
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
     <!-- Tabs Danh mục / Thương hiệu -->
     <LinearLayout
         android:id="@+id/tabContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="@android:color/white"
+        android:orientation="horizontal"
         android:paddingVertical="8dp">
 
         <TextView
@@ -49,10 +25,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:padding="8dp"
             android:text="Sản phẩm theo danh mục"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:padding="8dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tabBrand"
@@ -60,9 +36,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:padding="8dp"
             android:text="Thương hiệu"
-            android:textColor="@android:color/darker_gray"
-            android:padding="8dp" />
+            android:textColor="@android:color/darker_gray" />
     </LinearLayout>
 
     <!-- Nội dung -->

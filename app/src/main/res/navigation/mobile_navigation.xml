@@ -9,7 +9,38 @@
         android:id="@+id/navigation_home"
         android:name="com.example.skinshine.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.skinshine.ui.login.LoginFragment"
+        android:label="Login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/navigation_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.skinshine.ui.product.ProductDetailFragment"
+        android:label="Chi tiết sản phẩm">
+        <argument
+            android:name="productId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_productDetailFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_productDetailFragment_to_productComparisonFragment"
+            app:destination="@id/productComparisonFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -17,17 +48,24 @@
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
+    <!--    <fragment-->
+    <!--        android:id="@+id/navigation_order_history"-->
+    <!--        android:name="com.example.skinshine.ui.orderhistory.OrderHistoryFragment"-->
+    <!--        android:label="Lịch sử đơn hàng"-->
+    <!--        tools:layout="@layout/fragment_order_history" />-->
+
     <fragment
         android:id="@+id/navigation_category"
         android:name="com.example.skinshine.ui.category.CategoryFragment"
         android:label="Danh mục"
-        tools:layout="@layout/fragment_category" />
+        tools:layout="@layout/activity_category" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.skinshine.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
     <fragment
         android:id="@+id/navigation_member"
         android:name="com.example.skinshine.ui.profile.ProfileFragment"
@@ -40,17 +78,7 @@
             android:id="@+id/action_profileFragment_self"
             app:destination="@id/loginFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.skinshine.ui.login.LoginFragment"
-        android:label="Login">
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/navigation_home" />
-    </fragment>
+
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.skinshine.ui.register.RegisterFragment"
@@ -59,17 +87,7 @@
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/productDetailFragment"
-        android:name="com.example.skinshine.ui.product.ProductDetailFragment"
-        android:label="Chi tiết sản phẩm">
-        <argument
-            android:name="productId"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_productDetailFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
+
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.example.skinshine.ui.cart.CartFragment"
@@ -78,4 +96,9 @@
             android:id="@+id/action_cartFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/productComparisonFragment"
+        android:name="com.example.skinshine.ui.product.ProductComparisonFragment"
+        android:label="So sánh sản phẩm"
+        tools:layout="@layout/fragment_product_comparison" />
 </navigation>

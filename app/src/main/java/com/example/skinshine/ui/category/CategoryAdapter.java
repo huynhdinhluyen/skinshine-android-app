@@ -20,10 +20,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     private final OnCategoryClickListener listener;
     private int selectedPosition = 0;
 
-    public interface OnCategoryClickListener {
-        void onCategoryClick(Category category);
-    }
-
     public CategoryAdapter(List<Category> categoryList, OnCategoryClickListener listener) {
         this.categoryList = categoryList;
         this.listener = listener;
@@ -60,6 +56,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     @Override
     public int getItemCount() {
         return categoryList.size();
+    }
+
+    public interface OnCategoryClickListener {
+        void onCategoryClick(Category category);
     }
 
     static class CategoryViewHolder extends RecyclerView.ViewHolder {

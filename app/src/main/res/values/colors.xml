@@ -16,5 +16,11 @@
     <color name="textColorSecondary">#757575</color> <!-- Medium Grey -->
     <color name="dividerColor">#E0E0E0</color> <!-- Light Grey for dividers -->
     <color name="placeholder_bg">#DDDDDD</color>
-    <color name="gray_200">#EEEEEE</color> <!-- Bạn có thể đổi mã màu nếu muốn -->
+    <color name="gray_200">#EEEEEE</color>
+
+    <!-- App colors -->
+    <color name="primary_green">#A8D8B9</color>
+    <color name="primary_green_dark">#7BB68A</color>
+    <color name="background_light">#FFF9F0</color>
+    <color name="accent_orange">#FFDAC1</color>
 </resources>

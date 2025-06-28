@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.skinshine.R;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -25,7 +26,7 @@ public class RegisterFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     public RegisterFragment() {
-        super(R.layout.fragment_register);
+        super(R.layout.activity_register);
     }
 
     public boolean isValidPhoneNumber(String phone) {
@@ -41,8 +42,8 @@ public class RegisterFragment extends Fragment {
         EditText edtFullName = view.findViewById(R.id.edtFullName);
         EditText edtUsername = view.findViewById(R.id.edtUsername);
         EditText edtPhone = view.findViewById(R.id.edtPhone);
-        EditText edtPassword = view.findViewById(R.id.edtPassword);
-        EditText edtConfirmPassword = view.findViewById(R.id.edtConfirmPassword);
+        TextInputEditText edtPassword = view.findViewById(R.id.edtPassword);
+        TextInputEditText edtConfirmPassword = view.findViewById(R.id.edtConfirmPassword);
         Button btnRegisterConfirm = view.findViewById(R.id.btnRegisterConfirm);
         TextView tvGoToLogin = view.findViewById(R.id.tvGoToLogin);
 

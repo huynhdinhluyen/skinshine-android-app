@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -27,10 +26,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private final List<Product> productList;
     private final Context context;
     private final OnProductClickListener listener;
-
-    public interface OnProductClickListener {
-        void onProductClick(Product product);
-    }
 
     public ProductAdapter(Context context, List<Product> productList, OnProductClickListener listener) {
         this.context = context;
@@ -107,6 +102,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.productList.clear();
         this.productList.addAll(newProducts);
         diffResult.dispatchUpdatesTo(this);
+    }
+
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {

@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
 
     <ImageView
-        android:id="@+id/imgIcon"
+        android:id="@+id/iconSupport"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/baseline_store_24"
         android:layout_marginEnd="16dp"
-        app:tint="#0097A7" />
+        android:contentDescription="Support icon" />
 
     <TextView
-        android:id="@+id/txtTitle"
-        android:text="@string/item_support_store"
-        android:textSize="16sp"
-        android:textColor="#222"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:id="@+id/textSupportTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Support title"
+        android:textColor="#2E2E2E"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="Arrow right"
+        android:src="@drawable/ic_arrow_right" />
+
 </LinearLayout>

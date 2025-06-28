@@ -22,10 +22,6 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     private final OnBrandClickListener listener;
     private int selectedPosition = 0;
 
-    public interface OnBrandClickListener {
-        void onBrandClick(Brand brand);
-    }
-
     public BrandAdapter(List<Brand> brandList, OnBrandClickListener listener) {
         this.brandList = brandList;
         this.listener = listener;
@@ -71,6 +67,10 @@ public class BrandAdapter extends RecyclerView.Adapter<BrandAdapter.BrandViewHol
     @Override
     public int getItemCount() {
         return brandList.size();
+    }
+
+    public interface OnBrandClickListener {
+        void onBrandClick(Brand brand);
     }
 
     public static class BrandViewHolder extends RecyclerView.ViewHolder {
