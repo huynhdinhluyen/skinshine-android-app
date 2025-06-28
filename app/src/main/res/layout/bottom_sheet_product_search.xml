@@ -3,97 +3,107 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_bg"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="@color/white"
-    android:padding="16dp"
-    app:behavior_hideable="false"
-    app:behavior_peekHeight="400dp"
-    app:behavior_skipCollapsed="false"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    android:padding="20dp">
 
-    <!-- Handle -->
+    <!-- Handle bar -->
     <View
-        android:layout_width="40dp"
+        android:layout_width="48dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
-        android:background="#E0E0E0"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:alpha="0.3"
+        android:background="@drawable/bottom_sheet_handle" />
 
     <!-- Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tìm sản phẩm để so sánh"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#2E2E2E"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:text="Tìm sản phẩm để so sánh"
+        android:textColor="#2E2E2E"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-    <!-- Search input với background trắng -->
-    <androidx.cardview.widget.CardView
+    <!-- Search input với design mới -->
+    <FrameLayout
+        android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="@color/white">
+        android:layout_marginBottom="16dp">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="12dp">
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="3dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_search"
-                android:layout_marginEnd="8dp"
-                app:tint="#666666" />
-
-            <EditText
-                android:id="@+id/editTextSearch"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Nhập tên sản phẩm..."
-                android:textSize="16sp"
-                android:textColor="#2E2E2E"
-                android:textColorHint="#888888"
-                android:background="@null"
-                android:inputType="text"
-                android:imeOptions="actionSearch"
-                android:maxLines="1" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
 
-            <ImageView
-                android:id="@+id/btnClearSearch"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_close"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp"
-                android:visibility="gone"
-                app:tint="#666666" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="#666666" />
 
-    <!-- Search results container -->
+                <EditText
+                    android:id="@+id/editTextSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="Nhập tên sản phẩm..."
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="#2E2E2E"
+                    android:textColorHint="#888888"
+                    android:textSize="16sp"
+                    android:windowSoftInputMode="adjustResize" />
+
+                <ImageView
+                    android:id="@+id/btnClearSearch"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Xóa tìm kiếm"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_clear"
+                    android:visibility="gone"
+                    app:tint="#999999" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
+
+    <!-- Content container -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="350dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minHeight="300dp">
 
-        <!-- Search results -->
+        <!-- Results list -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerSearchResults"
+            android:id="@+id/recyclerViewSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="4dp"
-            android:background="@color/white" />
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical" />
 
-        <!-- Loading -->
+        <!-- Loading state -->
         <LinearLayout
             android:id="@+id/loadingLayout"
             android:layout_width="match_parent"
@@ -103,6 +113,7 @@
             android:visibility="gone">
 
             <ProgressBar
+                android:id="@+id/progressBar"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginBottom="16dp" />
@@ -127,8 +138,8 @@
             <ImageView
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/ic_search"
                 android:layout_marginBottom="16dp"
+                android:src="@drawable/ic_search"
                 app:tint="#CCCCCC" />
 
             <TextView
@@ -142,10 +153,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Hãy thử từ khóa khác"
                 android:textColor="#999999"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

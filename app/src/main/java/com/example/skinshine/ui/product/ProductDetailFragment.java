@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -27,6 +28,7 @@ import com.example.skinshine.data.repository.ProductRepository;
 import com.example.skinshine.data.repository.impl.ProductRepositoryImpl;
 import com.example.skinshine.ui.cart.CartViewModel;
 import com.example.skinshine.utils.cart.CartBadgeHelper;
+import com.example.skinshine.utils.product.ComparisonManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -45,6 +47,7 @@ public class ProductDetailFragment extends Fragment {
     private ProductComparisonViewModel comparisonViewModel;
     private boolean isComparisonMode = false;
     private ProductRepository productRepository;
+    private ComparisonManager comparisonManager;
 
     @Nullable
     @Override
@@ -92,12 +95,16 @@ public class ProductDetailFragment extends Fragment {
         }
         cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
         comparisonViewModel = new ViewModelProvider(this).get(ProductComparisonViewModel.class);
-        Button btnCompare = view.findViewById(R.id.btnCompare);
-        if (btnCompare != null) {
-            btnCompare.setOnClickListener(v -> showProductComparison());
+        CardView compareCard = view.findViewById(R.id.compareCard);
+        if (compareCard != null) {
+            compareCard.setOnClickListener(v -> showProductComparison());
         }
 
         return view;
+    }
+
+    private void setupComparisonManager() {
+        comparisonManager = ComparisonManager.getInstance();
     }
 
     private void showProductComparison() {
@@ -106,9 +113,10 @@ public class ProductDetailFragment extends Fragment {
             return;
         }
 
-        comparisonViewModel.setCurrentProduct(currentProduct);
-        isComparisonMode = true;
+        // Set current product cho comparison
+        comparisonManager.setCurrentProduct(currentProduct);
 
+        // Show bottom sheet để chọn sản phẩm so sánh
         showComparisonBottomSheet();
     }
 
@@ -125,7 +133,7 @@ public class ProductDetailFragment extends Fragment {
                     updateUI(currentProduct);
 
                     if (comparisonViewModel != null) {
-                        comparisonViewModel.setCurrentProduct(currentProduct);
+                        comparisonManager.setCurrentProduct(currentProduct);
                     }
                 } else if (result.isError()) {
                     Toast.makeText(getContext(), "Lỗi: " + result.getMessage(), Toast.LENGTH_SHORT).show();
@@ -243,7 +251,7 @@ public class ProductDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        setupComparisonManager();
         View cartBadgeContainer = view.findViewById(R.id.cartBadgeContainer);
         if (cartBadgeContainer != null) {
             TextView cartBadge = cartBadgeContainer.findViewById(R.id.cartBadge);

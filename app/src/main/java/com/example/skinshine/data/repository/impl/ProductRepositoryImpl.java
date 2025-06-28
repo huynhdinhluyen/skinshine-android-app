@@ -110,8 +110,41 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public LiveData<List<String>> getProductNames() {
+        MutableLiveData<List<String>> namesLiveData = new MutableLiveData<>();
+        List<String> defaultNames = new ArrayList<>();
+        defaultNames.add("Kem dưỡng ẩm");
+        defaultNames.add("Serum vitamin C");
+        defaultNames.add("Sữa rửa mặt");
+
+        db.collection("products")
+                .whereEqualTo("is_active", true)
+                .limit(20)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                        List<String> fetchedNames = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            String name = doc.getString("name");
+                            if (name != null && !name.trim().isEmpty()) {
+                                fetchedNames.add(name);
+                            }
+                        }
+                        namesLiveData.setValue(fetchedNames);
+                    } else {
+                        namesLiveData.setValue(defaultNames);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Lỗi khi tải tên sản phẩm cho placeholder: ", e);
+                    namesLiveData.setValue(defaultNames);
+                });
+
+        return namesLiveData;
+    }
+
+    @Override
     public void refreshProducts() {
-        // Force refresh by detaching and reattaching listener
         if (productsListener != null) {
             productsListener.remove();
         }

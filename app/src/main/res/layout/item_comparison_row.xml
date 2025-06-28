@@ -10,11 +10,11 @@
         android:id="@+id/textLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:text="Label"
-        android:textStyle="bold"
         android:textColor="#2E2E2E"
         android:textSize="14sp"
-        android:layout_marginBottom="4dp" />
+        android:textStyle="bold" />
 
     <!-- Values comparison -->
     <LinearLayout
@@ -26,31 +26,31 @@
             android:id="@+id/textCurrentValue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:background="@drawable/comparison_current_bg"
+            android:padding="8dp"
             android:text="Current Value"
             android:textColor="#666666"
-            android:textSize="13sp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/comparison_current_bg"
-            android:padding="8dp" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/textCompareValue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
+            android:background="@drawable/comparison_compare_bg"
+            android:padding="8dp"
             android:text="Compare Value"
             android:textColor="#666666"
-            android:textSize="13sp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/comparison_compare_bg"
-            android:padding="8dp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- Divider -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#F0F0F0"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="#F0F0F0" />
 </LinearLayout>

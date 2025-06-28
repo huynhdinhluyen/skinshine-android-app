@@ -10,23 +10,26 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
-import com.example.skinshine.data.model.ProductComparison;
+import com.example.skinshine.utils.product.ComparisonManager;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class ProductComparisonFragment extends Fragment {
+public class ProductComparisonFragment extends Fragment implements ComparisonManager.OnComparisonChangeListener {
 
-    private ProductComparisonViewModel viewModel;
+    private ComparisonManager comparisonManager;
     private ImageView imageCurrentProduct, imageCompareProduct;
     private TextView textCurrentName, textCompareName;
     private LinearLayout comparisonContainer;
+    private View rootView;
 
     @Nullable
     @Override
@@ -40,9 +43,26 @@ public class ProductComparisonFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        rootView = view;
+        setupWindowInsets(view);
         initViews(view);
-        setupViewModel();
-        observeViewModel();
+        setupComparisonManager();
+
+        // Load comparison nếu đã có data
+        if (comparisonManager.isComparing()) {
+            updateComparisonUI(comparisonManager.getCurrentProduct(), comparisonManager.getCompareProduct());
+        }
+    }
+
+    private void setupWindowInsets(View view) {
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            // Apply top padding for status bar
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom);
+
+            return insets;
+        });
     }
 
     private void initViews(View view) {
@@ -58,22 +78,30 @@ public class ProductComparisonFragment extends Fragment {
         });
     }
 
-    private void setupViewModel() {
-        viewModel = new ViewModelProvider(requireActivity()).get(ProductComparisonViewModel.class);
+    private void setupComparisonManager() {
+        comparisonManager = ComparisonManager.getInstance();
+        comparisonManager.setOnComparisonChangeListener(this);
     }
 
-    private void observeViewModel() {
-        viewModel.getComparison().observe(getViewLifecycleOwner(), this::updateComparisonUI);
+    @Override
+    public void onComparisonUpdated(Product current, Product compare) {
+        if (getView() != null) {
+            updateComparisonUI(current, compare);
+        }
     }
 
-    private void updateComparisonUI(ProductComparison comparison) {
-        if (!comparison.isComparing()) {
+    @Override
+    public void onComparisonCleared() {
+        // Navigate back hoặc clear UI
+        requireActivity().getOnBackPressedDispatcher().onBackPressed();
+    }
+
+    private void updateComparisonUI(Product currentProduct, Product compareProduct) {
+        if (currentProduct == null || compareProduct == null) {
             return;
         }
 
-        Product currentProduct = comparison.getCurrentProduct();
-        Product compareProduct = comparison.getCompareProduct();
-
+        // Load images
         Glide.with(this)
                 .load(currentProduct.getImageUrl())
                 .placeholder(R.color.placeholder_bg)
@@ -201,7 +229,9 @@ public class ProductComparisonFragment extends Fragment {
     }
 
     private void addComparisonRow(String label, String currentValue, String compareValue) {
-        View rowView = LayoutInflater.from(getContext()).inflate(R.layout.item_comparison_row, comparisonContainer, false);
+        View rowView = LayoutInflater
+                .from(getContext())
+                .inflate(R.layout.item_comparison_row, comparisonContainer, false);
 
         TextView textLabel = rowView.findViewById(R.id.textLabel);
         TextView textCurrentValue = rowView.findViewById(R.id.textCurrentValue);
@@ -219,5 +249,13 @@ public class ProductComparisonFragment extends Fragment {
             return text != null ? text : "Không có thông tin";
         }
         return text.substring(0, maxLength) + "...";
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (comparisonManager != null) {
+            comparisonManager.setOnComparisonChangeListener(null);
+        }
     }
 }
