@@ -56,4 +56,5 @@
     <string name="compare">So sánh</string>
     <string name="product_name">Tên sản phẩm</string>
     <string name="brand">Thương hiệu</string>
+    <string name="delete_search">Xóa tìm kiếm</string>
 </resources>

@@ -56,7 +56,7 @@ public class BannerRepositoryImpl implements BannerRepository {
                                 Log.e(TAG, "Error parsing banner: " + e.getMessage());
                             }
                         }
-                            bannersLiveData.setValue(Result.success(banners));
+                        bannersLiveData.setValue(Result.success(banners));
                     }
                 });
     }

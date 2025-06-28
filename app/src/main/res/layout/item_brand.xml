@@ -2,24 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:gravity="center_horizontal">
+    android:padding="12dp">
 
     <ImageView
         android:id="@+id/imageBrandLogo"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginBottom="8dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="Logo thương hiệu" />
+        android:contentDescription="Logo thương hiệu"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/textBrandName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Thương hiệu"
-        android:textSize="14sp"
+        android:textAlignment="center"
         android:textColor="#000000"
-        android:textAlignment="center" />
+        android:textSize="14sp" />
 </LinearLayout>

@@ -4,25 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
+        android:background="@color/white"
         android:gravity="center_vertical"
-        android:background="@color/white">
+        android:orientation="horizontal"
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/imageProduct"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginEnd="12dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/rounded_image_bg" />
+            android:background="@drawable/rounded_image_bg"
+            android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -34,38 +34,38 @@
                 android:id="@+id/textName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/product_name"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#2E2E2E"
+                android:ellipsize="end"
                 android:maxLines="2"
-                android:ellipsize="end" />
+                android:text="@string/product_name"
+                android:textColor="#2E2E2E"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textBrand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="@string/brand"
-                android:textSize="12sp"
                 android:textColor="#666666"
-                android:layout_marginTop="2dp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/textPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="0đ"
-                android:textSize="14sp"
-                android:textStyle="bold"
                 android:textColor="#E91E63"
-                android:layout_marginTop="4dp" />
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_compare"
             android:contentDescription="@string/compare"
+            android:src="@drawable/ic_compare"
             app:tint="?attr/colorPrimary" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

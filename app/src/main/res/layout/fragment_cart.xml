@@ -86,10 +86,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
+            android:gravity="center"
             android:text="Hãy thêm sản phẩm yêu thích vào giỏ hàng nhé!"
             android:textColor="#666666"
-            android:textSize="16sp"
-            android:gravity="center" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnContinueShopping"

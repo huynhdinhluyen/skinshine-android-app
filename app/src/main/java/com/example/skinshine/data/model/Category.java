@@ -4,7 +4,8 @@ public class Category {
     private String id;
     private String name;
 
-    public Category() {} // Bắt buộc cho Firestore
+    public Category() {
+    }
 
     public Category(String id, String name) {
         this.id = id;
