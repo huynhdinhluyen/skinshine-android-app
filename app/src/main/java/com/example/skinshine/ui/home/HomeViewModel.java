@@ -8,8 +8,8 @@ import com.example.skinshine.data.model.BannerItem;
 import com.example.skinshine.data.model.Product;
 import com.example.skinshine.data.model.Result;
 import com.example.skinshine.data.repository.BannerRepository;
-import com.example.skinshine.data.repository.impl.BannerRepositoryImpl;
 import com.example.skinshine.data.repository.ProductRepository;
+import com.example.skinshine.data.repository.impl.BannerRepositoryImpl;
 import com.example.skinshine.data.repository.impl.ProductRepositoryImpl;
 
 import java.util.List;

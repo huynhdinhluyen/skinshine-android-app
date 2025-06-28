@@ -1,7 +1,10 @@
 package com.example.skinshine.ui.product;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -10,57 +13,52 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.Product;
+import com.example.skinshine.utils.product.ComparisonManager;
 import com.example.skinshine.utils.product.PlaceholderManager;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
+    private static final String TAG = "ComparisonBottomSheet";
 
     private ProductComparisonViewModel viewModel;
     private ProductSearchAdapter adapter;
+    private PlaceholderManager placeholderManager;
+    private ComparisonManager comparisonManager;
+
+    // Views
     private EditText editTextSearch;
     private ImageView btnClearSearch;
-    private RecyclerView recyclerSearchResults;
-    private LinearLayout loadingLayout, emptyLayout;
+    private RecyclerView recyclerView;
+    private ProgressBar progressBar;
+    private LinearLayout loadingLayout;
+    private LinearLayout emptyLayout;
+    private FrameLayout searchContainer;
+
     private String currentSearchQuery = "";
-    private PlaceholderManager placeholderManager;
-
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-
-        // Set window soft input mode
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
-
-        dialog.setOnShowListener(dialogInterface -> {
-            BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
-            View bottomSheetInternal = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottomSheetInternal != null) {
-                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
-                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                behavior.setSkipCollapsed(true);
-                behavior.setDraggable(true);
-            }
-        });
-
-        return dialog;
-    }
 
     @Nullable
     @Override
@@ -71,88 +69,108 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
 
+        setupWindowInsets(view);
         initViews(view);
         setupViewModel();
+        setupComparisonManager();
         setupRecyclerView();
         setupSearchInput();
         observeViewModel();
     }
 
-    @Override
-    public int getTheme() {
-        return R.style.BottomSheetDialog;
+    private void setupWindowInsets(View view) {
+        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+
+            // Adjust for keyboard
+            v.setPadding(0, 0, 0, Math.max(systemBars.bottom, ime.bottom));
+
+            return insets;
+        });
     }
 
+    @NonNull
     @Override
-    public void onResume() {
-        super.onResume();
-        if (placeholderManager != null && editTextSearch.getText().toString().trim().isEmpty()) {
-            placeholderManager.startRotatingPlaceholder();
-        }
-    }
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (placeholderManager != null) {
-            placeholderManager.stopRotatingPlaceholder();
-        }
-    }
+        dialog.setOnShowListener(dialogInterface -> {
+            BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
+            View bottomSheetInternal = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheetInternal != null) {
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+                behavior.setDraggable(true);
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (placeholderManager != null) {
-            placeholderManager.stopRotatingPlaceholder();
-        }
+                // Set height to 80% of screen
+                ViewGroup.LayoutParams layoutParams = bottomSheetInternal.getLayoutParams();
+                layoutParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+                bottomSheetInternal.setLayoutParams(layoutParams);
+            }
+        });
+
+        // Handle soft keyboard
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        return dialog;
     }
 
     private void initViews(View view) {
         editTextSearch = view.findViewById(R.id.editTextSearch);
         btnClearSearch = view.findViewById(R.id.btnClearSearch);
-        recyclerSearchResults = view.findViewById(R.id.recyclerSearchResults);
+        recyclerView = view.findViewById(R.id.recyclerViewSearch);
+        progressBar = view.findViewById(R.id.progressBar);
         loadingLayout = view.findViewById(R.id.loadingLayout);
         emptyLayout = view.findViewById(R.id.emptyLayout);
-
-        placeholderManager = new PlaceholderManager(editTextSearch);
+        searchContainer = view.findViewById(R.id.searchContainer);
     }
 
     private void setupViewModel() {
         viewModel = new ViewModelProvider(requireActivity()).get(ProductComparisonViewModel.class);
     }
 
+    private void setupComparisonManager() {
+        comparisonManager = ComparisonManager.getInstance();
+    }
+
     private void setupRecyclerView() {
         adapter = new ProductSearchAdapter(this::onProductSelected);
-        recyclerSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerSearchResults.setAdapter(adapter);
+        adapter.updateProducts(new ArrayList<>());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
     }
 
     private void setupSearchInput() {
+        placeholderManager = new PlaceholderManager(editTextSearch);
+
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
                 String query = s.toString().trim();
                 currentSearchQuery = query;
 
-                // Show/hide clear button
                 btnClearSearch.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
 
                 if (query.isEmpty()) {
-                    // Clear results và bắt đầu rotating placeholder
                     adapter.updateProducts(null);
                     showEmptyState(false);
                     placeholderManager.startRotatingPlaceholder();
                 } else {
-                    // Dừng rotating placeholder khi người dùng nhập
                     placeholderManager.stopRotatingPlaceholder();
-
                     if (query.length() >= 1) {
                         performSearch(query);
                     } else {
@@ -165,83 +183,115 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
         btnClearSearch.setOnClickListener(v -> {
             editTextSearch.setText("");
             editTextSearch.requestFocus();
-            placeholderManager.startRotatingPlaceholder();
         });
-
-        // Focus và bắt đầu rotating placeholder
-        editTextSearch.requestFocus();
         placeholderManager.startRotatingPlaceholder();
     }
 
+    private void observeViewModel() {
+        viewModel.getSearchResults().observe(getViewLifecycleOwner(), products -> {
+            if (products != null) {
+                List<Product> filteredProducts = new ArrayList<>();
+                Product currentProduct = comparisonManager.getCurrentProduct();
+
+                for (Product product : products) {
+                    if (currentProduct == null ||
+                            !product.getId().equals(currentProduct.getId())) {
+                        filteredProducts.add(product);
+                    }
+                }
+
+                adapter.updateProducts(filteredProducts);
+                showResults(filteredProducts.isEmpty());
+            }
+        });
+
+        viewModel.getIsSearching().observe(getViewLifecycleOwner(), isSearching -> {
+            if (isSearching) {
+                showLoading();
+            }
+        });
+
+        viewModel.getError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                showEmptyState(true);
+            }
+        });
+
+        viewModel.getProductNames().observe(getViewLifecycleOwner(), names -> {
+            if (placeholderManager != null) {
+                placeholderManager.setProductNames(names);
+            }
+        });
+    }
+
     private void performSearch(String query) {
-        Log.d("ComparisonBottomSheet", "Performing search for: '" + query + "'");
-        showLoading(true);
         viewModel.searchProducts(query);
     }
 
-    private void observeViewModel() {
-        viewModel.getSearchResults().observe(this, products -> {
-            showLoading(false);
-
-            if (products != null && !products.isEmpty()) {
-                adapter.updateProducts(products);
-                showRecyclerView();
-            } else if (!currentSearchQuery.isEmpty()) {
-                showEmptyState(true);
-            } else {
-                showRecyclerView();
-            }
-        });
-
-        viewModel.getIsSearching().observe(this, isSearching -> {
-            showLoading(isSearching != null && isSearching);
-        });
-
-        viewModel.getError().observe(this, error -> {
-            if (error != null && !error.isEmpty()) {
-                showLoading(false);
-                showEmptyState(true);
-            }
-        });
-    }
-
-    private void showLoading(boolean show) {
-        loadingLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        recyclerSearchResults.setVisibility(show ? View.GONE : View.VISIBLE);
-        emptyLayout.setVisibility(View.GONE);
-    }
-
-    private void showEmptyState(boolean show) {
-        emptyLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        recyclerSearchResults.setVisibility(show ? View.GONE : View.VISIBLE);
-        loadingLayout.setVisibility(View.GONE);
-    }
-
-    private void showRecyclerView() {
-        recyclerSearchResults.setVisibility(View.VISIBLE);
-        loadingLayout.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.GONE);
-    }
-
     private void onProductSelected(Product product) {
-        viewModel.setCompareProduct(product);
+        Product currentProduct = comparisonManager.getCurrentProduct();
+        if (currentProduct != null && product.getId().equals(currentProduct.getId())) {
+            Toast.makeText(getContext(), "Không thể so sánh sản phẩm với chính nó", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        comparisonManager.setCompareProduct(product);
         dismiss();
 
-        // Navigate to comparison view
-        showFullComparison();
-    }
-
-    private void showFullComparison() {
         try {
-            androidx.navigation.NavController navController = androidx.navigation.Navigation.findNavController(
-                    requireActivity(), R.id.nav_host_fragment_activity_main);
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
             navController.navigate(R.id.productComparisonFragment);
         } catch (Exception e) {
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.nav_host_fragment_activity_main, new ProductComparisonFragment())
-                    .addToBackStack("comparison")
-                    .commit();
+            Log.e(TAG, "Error navigating to comparison", e);
+            Toast.makeText(getContext(), "Không thể mở màn hình so sánh", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (comparisonManager.isComparing() && getActivity() != null) {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    NavController navController = Navigation.findNavController(
+                            requireActivity(), R.id.nav_host_fragment_activity_main);
+                    navController.navigate(R.id.productComparisonFragment);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error navigating to comparison after dismiss", e);
+                    Toast.makeText(getContext(), "Không thể mở màn hình so sánh", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (placeholderManager != null) {
+            placeholderManager.stopRotatingPlaceholder();
+        }
+    }
+
+    private void showLoading() {
+        recyclerView.setVisibility(View.GONE);
+        emptyLayout.setVisibility(View.GONE);
+        loadingLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void showResults(boolean isEmpty) {
+        loadingLayout.setVisibility(View.GONE);
+
+        if (isEmpty) {
+            showEmptyState(true);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+        }
+    }
+
+    private void showEmptyState(boolean isSearchResult) {
+        recyclerView.setVisibility(View.GONE);
+        loadingLayout.setVisibility(View.GONE);
+        emptyLayout.setVisibility(isSearchResult ? View.VISIBLE : View.GONE);
     }
 }

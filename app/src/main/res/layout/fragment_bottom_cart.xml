@@ -2,56 +2,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:background="@android:color/white"
     android:orientation="vertical"
-    android:background="@android:color/white">
+    android:padding="16dp">
 
     <!-- Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Chọn Sản Phẩm"
-        android:textSize="18sp"
-        android:textStyle="bold"
         android:textColor="#2E2E2E"
-        android:gravity="center" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <!-- Product Info -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="16dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/imageProduct"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:scaleType="centerCrop"
-            android:layout_marginEnd="12dp" />
+            android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textProductName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tên sản phẩm"
-                android:textStyle="bold"
-                android:textColor="#2E2E2E" />
+                android:textColor="#2E2E2E"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textDiscountedPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="148,000đ"
                 android:textColor="#D32F2F"
-                android:textStyle="bold"
-                android:text="148,000đ" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textOriginalPrice"
@@ -67,43 +67,43 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Số lượng:"
-        android:textStyle="bold"
         android:textColor="#2E2E2E"
-        android:layout_marginTop="20dp" />
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnMinus"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:backgroundTint="#E0E0E0"
             android:text="-"
-            android:textColor="#2E2E2E"
-            android:backgroundTint="#E0E0E0" />
+            android:textColor="#2E2E2E" />
 
         <TextView
             android:id="@+id/textQuantity"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:text="1"
             android:gravity="center"
-            android:textSize="16sp"
+            android:text="1"
             android:textColor="#2E2E2E"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnPlus"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:backgroundTint="#E0E0E0"
             android:text="+"
-            android:textColor="#2E2E2E"
-            android:backgroundTint="#E0E0E0" />
+            android:textColor="#2E2E2E" />
     </LinearLayout>
 
     <!-- Total Price -->
@@ -111,19 +111,19 @@
         android:id="@+id/textTotalPrice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="Tổng tiền: 148,000đ"
-        android:textStyle="bold"
-        android:textSize="16sp"
         android:textColor="#2E2E2E"
-        android:layout_marginTop="20dp" />
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <!-- Add to Cart Button -->
     <Button
         android:id="@+id/btnConfirmAddToCart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🛒 Thêm vào giỏ"
         android:layout_marginTop="20dp"
-        android:textColor="@android:color/white"
-        android:backgroundTint="#FF9800" />
+        android:backgroundTint="#FF9800"
+        android:text="🛒 Thêm vào giỏ"
+        android:textColor="@android:color/white" />
 </LinearLayout>

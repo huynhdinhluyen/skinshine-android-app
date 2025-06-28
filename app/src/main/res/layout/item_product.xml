@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardElevation="4dp">
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,68 +19,68 @@
             android:id="@+id/imageViewProduct"
             android:layout_width="0dp"
             android:layout_height="140dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/product_image_description"
             android:background="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/product_image_description"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Brand -->
         <TextView
             android:id="@+id/textViewBrand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Brand"
-            android:textSize="10sp"
             android:textAllCaps="true"
             android:textColor="#999999"
-            app:layout_constraintTop_toBottomOf="@id/imageViewProduct"
+            android:textSize="10sp"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="8dp" />
+            app:layout_constraintTop_toBottomOf="@id/imageViewProduct" />
 
         <!-- Product Name -->
         <TextView
             android:id="@+id/textViewProductName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
             android:maxLines="2"
             android:minLines="2"
-            android:ellipsize="end"
-            android:textSize="14sp"
             android:textColor="#000000"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/textViewBrand"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="2dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewBrand" />
         <!-- Rating -->
         <RatingBar
             android:id="@+id/ratingBar"
+            style="?android:attr/ratingBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="0.5"
-            android:isIndicator="true"
-            android:rating="4.5"
             android:layout_marginTop="4dp"
-            style="?android:attr/ratingBarStyleSmall"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:rating="4.5"
+            android:stepSize="0.5"
             android:theme="@style/RatingBarTheme"
-            app:layout_constraintTop_toBottomOf="@id/textViewProductName"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewProductName" />
 
         <!-- Price -->
         <TextView
             android:id="@+id/textViewProductPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="430.000 ₫"
-            android:textSize="16sp"
             android:textColor="#D32F2F"
+            android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/ratingBar"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="4dp" />
+            app:layout_constraintTop_toBottomOf="@id/ratingBar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

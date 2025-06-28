@@ -38,6 +38,7 @@ import java.util.TimerTask;
 
 public class HomeFragment extends Fragment {
 
+    private final Handler bannerHandler = new Handler(Looper.getMainLooper());
     private FragmentHomeBinding binding;
     private HomeViewModel homeViewModel;
     private CartViewModel cartViewModel;
@@ -47,7 +48,6 @@ public class HomeFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView errorTextView;
     private Timer bannerTimer;
-    private final Handler bannerHandler = new Handler(Looper.getMainLooper());
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

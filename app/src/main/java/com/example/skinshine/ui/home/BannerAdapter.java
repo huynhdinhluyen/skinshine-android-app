@@ -25,8 +25,8 @@ import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
 
-    private List<BannerItem> bannerItems;
     private final Context context;
+    private List<BannerItem> bannerItems;
 
     public BannerAdapter(Context context, List<BannerItem> bannerItems) {
         this.context = context;
@@ -75,6 +75,7 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     public static class BannerViewHolder extends RecyclerView.ViewHolder {
         ImageView imageViewBanner;
+
         BannerViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewBanner = itemView.findViewById(R.id.imageViewBanner);

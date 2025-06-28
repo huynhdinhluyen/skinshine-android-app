@@ -3,9 +3,6 @@ package com.example.skinshine;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.skinshine.ui.cart.CartViewModel;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -19,6 +16,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.skinshine.databinding.ActivityMainBinding;
+import com.example.skinshine.ui.cart.CartViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

@@ -23,12 +23,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     private List<CartItem> cartItems;
     private CartItemListener listener;
 
-    public interface CartItemListener {
-        void onQuantityChanged(CartItem item, int newQuantity);
-        void onDeleteItem(CartItem item);
-        void onItemSelected(CartItem item, boolean isSelected);
-    }
-
     public CartAdapter(List<CartItem> cartItems, CartItemListener listener) {
         this.cartItems = cartItems;
         this.listener = listener;
@@ -50,6 +44,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public int getItemCount() {
         return cartItems.size();
+    }
+
+    public interface CartItemListener {
+        void onQuantityChanged(CartItem item, int newQuantity);
+
+        void onDeleteItem(CartItem item);
+
+        void onItemSelected(CartItem item, boolean isSelected);
     }
 
     class CartViewHolder extends RecyclerView.ViewHolder {

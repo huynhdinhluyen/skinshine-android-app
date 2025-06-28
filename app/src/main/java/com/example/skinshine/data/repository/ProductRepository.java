@@ -9,7 +9,12 @@ import java.util.List;
 
 public interface ProductRepository {
     LiveData<Result<List<Product>>> getProducts();
+
     LiveData<Result<List<Product>>> searchProducts(String query);
+
     LiveData<Result<Product>> getProductById(String productId);
+
+    LiveData<List<String>> getProductNames();
+
     void refreshProducts();
 }

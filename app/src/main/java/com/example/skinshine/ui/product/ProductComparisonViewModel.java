@@ -20,6 +20,7 @@ public class ProductComparisonViewModel extends ViewModel {
     private final MediatorLiveData<List<Product>> searchResultsLiveData;
     private final MediatorLiveData<Boolean> isSearchingLiveData;
     private final MediatorLiveData<String> errorLiveData;
+    private final LiveData<List<String>> productNames;
 
     public ProductComparisonViewModel() {
         this.productRepository = new ProductRepositoryImpl();
@@ -27,10 +28,15 @@ public class ProductComparisonViewModel extends ViewModel {
         this.searchResultsLiveData = new MediatorLiveData<>();
         this.isSearchingLiveData = new MediatorLiveData<>();
         this.errorLiveData = new MediatorLiveData<>();
+        productNames = productRepository.getProductNames();
     }
 
     public LiveData<ProductComparison> getComparison() {
         return comparisonLiveData;
+    }
+
+    public LiveData<List<String>> getProductNames() {
+        return productNames;
     }
 
     public LiveData<List<Product>> getSearchResults() {

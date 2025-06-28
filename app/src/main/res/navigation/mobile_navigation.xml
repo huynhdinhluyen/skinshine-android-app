@@ -48,11 +48,11 @@
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
-<!--    <fragment-->
-<!--        android:id="@+id/navigation_order_history"-->
-<!--        android:name="com.example.skinshine.ui.orderhistory.OrderHistoryFragment"-->
-<!--        android:label="Lịch sử đơn hàng"-->
-<!--        tools:layout="@layout/fragment_order_history" />-->
+    <!--    <fragment-->
+    <!--        android:id="@+id/navigation_order_history"-->
+    <!--        android:name="com.example.skinshine.ui.orderhistory.OrderHistoryFragment"-->
+    <!--        android:label="Lịch sử đơn hàng"-->
+    <!--        tools:layout="@layout/fragment_order_history" />-->
 
     <fragment
         android:id="@+id/navigation_category"

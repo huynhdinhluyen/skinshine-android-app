@@ -22,10 +22,6 @@ public class ProductSearchAdapter extends RecyclerView.Adapter<ProductSearchAdap
     private List<Product> products = new ArrayList<>();
     private OnProductSelectListener listener;
 
-    public interface OnProductSelectListener {
-        void onProductSelected(Product product);
-    }
-
     public ProductSearchAdapter(OnProductSelectListener listener) {
         this.listener = listener;
     }
@@ -52,6 +48,10 @@ public class ProductSearchAdapter extends RecyclerView.Adapter<ProductSearchAdap
     @Override
     public int getItemCount() {
         return products.size();
+    }
+
+    public interface OnProductSelectListener {
+        void onProductSelected(Product product);
     }
 
     static class SearchViewHolder extends RecyclerView.ViewHolder {

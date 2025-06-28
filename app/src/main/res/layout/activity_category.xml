@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FFF8F2">
+    android:background="#FFF8F2"
+    android:orientation="vertical">
 
     <!-- Ô search + giỏ hàng -->
     <include
@@ -15,8 +15,8 @@
         android:id="@+id/tabContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:background="@android:color/white"
+        android:orientation="horizontal"
         android:paddingVertical="8dp">
 
         <TextView
@@ -25,10 +25,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:padding="8dp"
             android:text="Sản phẩm theo danh mục"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:padding="8dp" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tabBrand"
@@ -36,9 +36,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:padding="8dp"
             android:text="Thương hiệu"
-            android:textColor="@android:color/darker_gray"
-            android:padding="8dp" />
+            android:textColor="@android:color/darker_gray" />
     </LinearLayout>
 
     <!-- Nội dung -->
