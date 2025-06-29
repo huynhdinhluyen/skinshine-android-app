@@ -45,6 +45,16 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.auth)
+    implementation(
+        fileTree(
+            mapOf(
+                "dir" to "C:\\Users\\huynh\\OneDrive\\Desktop\\zalopay-sandbox",
+                "include" to listOf("*.aar", "*.jar"),
+                "exclude" to listOf("")
+            )
+        )
+    )
+    implementation(libs.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -57,4 +67,8 @@ dependencies {
     annotationProcessor(libs.compiler)
 
     implementation(libs.viewpager2)
+
+    implementation(libs.squareup.okhttp)
+    implementation(libs.commons.codec.commons.codec3)
+
 }

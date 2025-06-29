@@ -21,6 +21,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,7 +48,9 @@ public class CartFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_cart, container, false);
     }
 
@@ -55,14 +58,15 @@ public class CartFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initViews(view);
         setupWindowInsets(view);
 
         if (!isUserLoggedIn()) {
             redirectToLogin();
+            showEmptyCart();
             return;
         }
 
-        initViews(view);
         setupViewModel();
         setupRecyclerView();
         setupClickListeners();
@@ -141,6 +145,30 @@ public class CartFragment extends Fragment {
 
         Button btnContinueShopping = getView().findViewById(R.id.btnContinueShopping);
         btnContinueShopping.setOnClickListener(v -> navigateToHome());
+
+        Button btnCheckout = requireView().findViewById(R.id.btnCheckout);
+        btnCheckout.setOnClickListener(v -> {
+            ArrayList<CartItem> selectedItems = new ArrayList<>();
+            for (CartItem item : cartItems) {
+                if (item.isSelected()) {
+                    selectedItems.add(item);
+                }
+            }
+
+            // Kiểm tra nếu chưa chọn sản phẩm nào
+            if (selectedItems.isEmpty()) {
+                Toast.makeText(getContext(),
+                        "Vui lòng chọn ít nhất một sản phẩm để thanh toán",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Tạo bundle để truyền dữ liệu
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("selectedItems", selectedItems);
+            NavController nav = Navigation.findNavController(v);
+            nav.navigate(R.id.action_cartFragment_to_checkoutFragment, bundle);
+        });
     }
 
     private void observeViewModel() {
@@ -153,7 +181,6 @@ public class CartFragment extends Fragment {
         });
 
         cartViewModel.getLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            // Show/hide loading indicator if needed
             btnDeleteSelected.setEnabled(!isLoading);
         });
     }
