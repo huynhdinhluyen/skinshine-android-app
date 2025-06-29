@@ -101,4 +101,9 @@
         android:name="com.example.skinshine.ui.product.ProductComparisonFragment"
         android:label="So sánh sản phẩm"
         tools:layout="@layout/fragment_product_comparison" />
+    <dialog
+        android:id="@+id/comparisonBottomSheetFragment"
+        android:name="com.example.skinshine.ui.product.ComparisonBottomSheetFragment"
+        android:label="ComparisonBottomSheet"
+        tools:layout="@layout/bottom_sheet_product_search" />
 </navigation>

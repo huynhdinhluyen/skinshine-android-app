@@ -14,6 +14,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.skinshine.R;
@@ -42,6 +44,11 @@ public class ProductComparisonFragment extends Fragment implements ComparisonMan
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        ImageView btnClose = view.findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> {
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+        });
 
         rootView = view;
         setupWindowInsets(view);
@@ -92,8 +99,15 @@ public class ProductComparisonFragment extends Fragment implements ComparisonMan
 
     @Override
     public void onComparisonCleared() {
-        // Navigate back hoặc clear UI
         requireActivity().getOnBackPressedDispatcher().onBackPressed();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (comparisonManager != null) {
+            comparisonManager.setOnComparisonChangeListener(null);
+        }
     }
 
     private void updateComparisonUI(Product currentProduct, Product compareProduct) {
@@ -249,13 +263,5 @@ public class ProductComparisonFragment extends Fragment implements ComparisonMan
             return text != null ? text : "Không có thông tin";
         }
         return text.substring(0, maxLength) + "...";
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (comparisonManager != null) {
-            comparisonManager.setOnComparisonChangeListener(null);
-        }
     }
 }
