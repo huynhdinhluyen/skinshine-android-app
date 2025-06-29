@@ -250,16 +250,6 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
         result.putString(KEY_PRODUCT_ID, product.getId());
         getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
         dismiss();
-//        comparisonManager.setCompareProduct(product);
-//        dismiss();
-//
-//        try {
-//            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-//            navController.navigate(R.id.productComparisonFragment);
-//        } catch (Exception e) {
-//            Log.e(TAG, "Error navigating to comparison", e);
-//            Toast.makeText(getContext(), "Không thể mở màn hình so sánh", Toast.LENGTH_SHORT).show();
-//        }
     }
 
     @Override
