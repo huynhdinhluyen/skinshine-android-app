@@ -49,6 +49,20 @@ public class ProductDetailFragment extends Fragment {
     private ProductRepository productRepository;
     private ComparisonManager comparisonManager;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Lắng nghe kết quả trả về từ ComparisonBottomSheetFragment
+        getParentFragmentManager().setFragmentResultListener(ComparisonBottomSheetFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
+            String selectedProductId = bundle.getString(ComparisonBottomSheetFragment.KEY_PRODUCT_ID);
+            if (selectedProductId != null) {
+                // Tải đầy đủ thông tin của sản phẩm được chọn để so sánh
+                fetchCompareProductAndNavigate(selectedProductId);
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -103,6 +117,30 @@ public class ProductDetailFragment extends Fragment {
         return view;
     }
 
+    private void fetchCompareProductAndNavigate(String productId) {
+        productRepository.getProductById(productId).observe(getViewLifecycleOwner(), result -> {
+            if (result != null && result.isSuccess()) {
+                Product compareProduct = result.getData();
+                if (compareProduct != null) {
+                    // Set sản phẩm cần so sánh vào manager
+                    comparisonManager.setCompareProduct(compareProduct);
+
+                    // Chỉ điều hướng sau khi đã có đầy đủ dữ liệu
+                    try {
+                        NavController navController = Navigation.findNavController(requireView());
+                        navController.navigate(R.id.productComparisonFragment);
+                    } catch (IllegalStateException e) {
+                        Log.e("ProductDetail", "Không thể điều hướng, có thể view đã bị hủy.", e);
+                    } catch (Exception e) {
+                        Log.e("ProductDetail", "Lỗi khi điều hướng đến màn hình so sánh", e);
+                    }
+                }
+            } else if (result != null && result.isError()) {
+                Toast.makeText(getContext(), "Lỗi: " + result.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void setupComparisonManager() {
         comparisonManager = ComparisonManager.getInstance();
     }
@@ -121,8 +159,15 @@ public class ProductDetailFragment extends Fragment {
     }
 
     private void showComparisonBottomSheet() {
-        ComparisonBottomSheetFragment bottomSheet = new ComparisonBottomSheetFragment();
-        bottomSheet.show(getParentFragmentManager(), "comparison_bottom_sheet");
+//        ComparisonBottomSheetFragment bottomSheet = new ComparisonBottomSheetFragment();
+//        bottomSheet.show(getParentFragmentManager(), "comparison_bottom_sheet");
+        try {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.comparisonBottomSheetFragment);
+        } catch (Exception e) {
+            Log.e("ProductDetail", "Không thể mở bottom sheet so sánh", e);
+            Toast.makeText(getContext(), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fetchProduct(String productId) {

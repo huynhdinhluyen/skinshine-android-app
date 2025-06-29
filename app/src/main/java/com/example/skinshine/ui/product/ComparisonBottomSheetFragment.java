@@ -1,5 +1,8 @@
 package com.example.skinshine.ui.product;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -43,6 +46,8 @@ import java.util.List;
 
 public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
     private static final String TAG = "ComparisonBottomSheet";
+    public static final String REQUEST_KEY = "comparison_request";
+    public static final String KEY_PRODUCT_ID = "selected_product_id";
 
     private ProductComparisonViewModel viewModel;
     private ProductSearchAdapter adapter;
@@ -96,28 +101,27 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
 
     @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-
-        dialog.setOnShowListener(dialogInterface -> {
-            BottomSheetDialog d = (BottomSheetDialog) dialogInterface;
-            View bottomSheetInternal = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (bottomSheetInternal != null) {
-                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
+        dialog.setOnShowListener(dlg -> {
+            FrameLayout sheet = dialog.findViewById(
+                    com.google.android.material.R.id.design_bottom_sheet
+            );
+            if (sheet != null) {
+                BottomSheetBehavior<FrameLayout> behavior =
+                        BottomSheetBehavior.from(sheet);
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setFitToContents(true);
                 behavior.setSkipCollapsed(true);
-                behavior.setDraggable(true);
-
-                // Set height to 80% of screen
-                ViewGroup.LayoutParams layoutParams = bottomSheetInternal.getLayoutParams();
-                layoutParams.height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
-                bottomSheetInternal.setLayoutParams(layoutParams);
             }
         });
-
-        // Handle soft keyboard
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
+        // ensure keyboard resize
+        if (dialog.getWindow() != null) {
+            dialog.getWindow()
+                    .setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+                    );
+        }
         return dialog;
     }
 
@@ -156,6 +160,10 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String q = s.toString().trim();
+                btnClearSearch.setVisibility(q.isEmpty() ? GONE : VISIBLE);
+                placeholderManager.stopRotatingPlaceholder();
+                viewModel.searchProducts(q);
             }
 
             @Override
@@ -163,7 +171,7 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
                 String query = s.toString().trim();
                 currentSearchQuery = query;
 
-                btnClearSearch.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
+                btnClearSearch.setVisibility(query.isEmpty() ? GONE : VISIBLE);
 
                 if (query.isEmpty()) {
                     adapter.updateProducts(null);
@@ -190,6 +198,7 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
     private void observeViewModel() {
         viewModel.getSearchResults().observe(getViewLifecycleOwner(), products -> {
             if (products != null) {
+                showEmptyState(false);
                 List<Product> filteredProducts = new ArrayList<>();
                 Product currentProduct = comparisonManager.getCurrentProduct();
 
@@ -202,6 +211,8 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
 
                 adapter.updateProducts(filteredProducts);
                 showResults(filteredProducts.isEmpty());
+            } else {
+                showEmptyState(true);
             }
         });
 
@@ -235,16 +246,20 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
             Toast.makeText(getContext(), "Không thể so sánh sản phẩm với chính nó", Toast.LENGTH_SHORT).show();
             return;
         }
-        comparisonManager.setCompareProduct(product);
+        Bundle result = new Bundle();
+        result.putString(KEY_PRODUCT_ID, product.getId());
+        getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
         dismiss();
-
-        try {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.productComparisonFragment);
-        } catch (Exception e) {
-            Log.e(TAG, "Error navigating to comparison", e);
-            Toast.makeText(getContext(), "Không thể mở màn hình so sánh", Toast.LENGTH_SHORT).show();
-        }
+//        comparisonManager.setCompareProduct(product);
+//        dismiss();
+//
+//        try {
+//            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+//            navController.navigate(R.id.productComparisonFragment);
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error navigating to comparison", e);
+//            Toast.makeText(getContext(), "Không thể mở màn hình so sánh", Toast.LENGTH_SHORT).show();
+//        }
     }
 
     @Override
@@ -273,25 +288,25 @@ public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
     }
 
     private void showLoading() {
-        recyclerView.setVisibility(View.GONE);
-        emptyLayout.setVisibility(View.GONE);
-        loadingLayout.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(GONE);
+        emptyLayout.setVisibility(GONE);
+        loadingLayout.setVisibility(VISIBLE);
     }
 
     private void showResults(boolean isEmpty) {
-        loadingLayout.setVisibility(View.GONE);
+        loadingLayout.setVisibility(GONE);
 
         if (isEmpty) {
             showEmptyState(true);
         } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyLayout.setVisibility(View.GONE);
+            recyclerView.setVisibility(VISIBLE);
+            emptyLayout.setVisibility(GONE);
         }
     }
 
     private void showEmptyState(boolean isSearchResult) {
-        recyclerView.setVisibility(View.GONE);
-        loadingLayout.setVisibility(View.GONE);
-        emptyLayout.setVisibility(isSearchResult ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(GONE);
+        loadingLayout.setVisibility(GONE);
+        emptyLayout.setVisibility(isSearchResult ? VISIBLE : GONE);
     }
 }

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
         ViewCompat.setOnApplyWindowInsetsListener(navView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -56,19 +57,20 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_notifications
         ).build();
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.loginFragment ||
+                    destination.getId() == R.id.registerFragment ||
                     destination.getId() == R.id.cartFragment ||
                     destination.getId() == R.id.registerFragment ||
-                    destination.getId() == R.id.productDetailFragment) {
-                binding.navView.setVisibility(View.GONE);
+                    destination.getId() == R.id.productDetailFragment ||
+                    destination.getId() == R.id.productComparisonFragment
+            ) {
+                navView.setVisibility(View.GONE);
             } else {
-                binding.navView.setVisibility(View.VISIBLE);
+                navView.setVisibility(View.VISIBLE);
             }
         });
         setupAuthStateListener();
