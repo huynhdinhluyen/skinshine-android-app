@@ -1,5 +1,6 @@
 package com.example.skinshine;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -20,6 +21,8 @@ import com.example.skinshine.ui.cart.CartViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import vn.zalopay.sdk.ZaloPaySDK;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -66,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
                     destination.getId() == R.id.cartFragment ||
                     destination.getId() == R.id.registerFragment ||
                     destination.getId() == R.id.productDetailFragment ||
-                    destination.getId() == R.id.productComparisonFragment
+                    destination.getId() == R.id.productComparisonFragment ||
+                    destination.getId() == R.id.checkoutFragment
             ) {
                 navView.setVisibility(View.GONE);
             } else {
@@ -81,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                // Handle auth state changes if needed
-                // Note: Removed the nonexistent methods calls
             }
         };
     }
@@ -106,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Any resume logic here
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        ZaloPaySDK.getInstance().onResult(intent);
     }
 }

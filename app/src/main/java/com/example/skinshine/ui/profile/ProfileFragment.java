@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -181,7 +182,11 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Chức năng chỉnh sửa hồ sơ đang được phát triển", Toast.LENGTH_SHORT).show();
                 break;
             case "Lịch sử đơn hàng":
-                Toast.makeText(getContext(), "Chức năng lịch sử đơn hàng đang được phát triển", Toast.LENGTH_SHORT).show();
+                try {
+                    Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_orderHistoryFragment);
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Không thể mở lịch sử đơn hàng", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;

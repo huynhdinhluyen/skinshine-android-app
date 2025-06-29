@@ -1,8 +1,11 @@
 package com.example.skinshine.data.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.firestore.Exclude;
 
-public class CartItem {
+public class CartItem implements Parcelable {
     private String productId;
     private String productName;
     private String imageUrl;
@@ -23,7 +26,42 @@ public class CartItem {
         this.price = price;
     }
 
-    // ✅ Getter/Setter cho "selected"
+    protected CartItem(Parcel in) {
+        productId = in.readString();
+        productName = in.readString();
+        imageUrl = in.readString();
+        quantity = in.readInt();
+        price = in.readDouble();
+        selected = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(productId);
+        dest.writeString(productName);
+        dest.writeString(imageUrl);
+        dest.writeInt(quantity);
+        dest.writeDouble(price);
+        dest.writeByte((byte) (selected ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<CartItem> CREATOR = new Creator<CartItem>() {
+        @Override
+        public CartItem createFromParcel(Parcel in) {
+            return new CartItem(in);
+        }
+
+        @Override
+        public CartItem[] newArray(int size) {
+            return new CartItem[size];
+        }
+    };
+
     public boolean isSelected() {
         return selected;
     }
@@ -32,7 +70,6 @@ public class CartItem {
         this.selected = selected;
     }
 
-    // Other GETTER & SETTER
     public String getProductId() {
         return productId;
     }
