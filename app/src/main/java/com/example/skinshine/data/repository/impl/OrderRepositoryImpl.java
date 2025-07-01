@@ -64,4 +64,45 @@ public class OrderRepositoryImpl implements OrderRepository {
                 });
         return ordersResult;
     }
+
+    @Override
+    public LiveData<Result<List<Order>>> getAllOrders() {
+        MutableLiveData<Result<List<Order>>> ordersResult = new MutableLiveData<>();
+        db.collection("orders")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        ordersResult.postValue(Result.error(e.getMessage()));
+                        return;
+                    }
+                    if (snapshots != null) {
+                        List<Order> orders = snapshots.toObjects(Order.class);
+                        ordersResult.postValue(Result.success(orders));
+                    }
+                });
+        return ordersResult;
+    }
+
+    @Override
+    public LiveData<Result<Order>> getOrderById(String orderId) {
+        MutableLiveData<Result<Order>> orderResult = new MutableLiveData<>();
+        if (orderId == null || orderId.isEmpty()) {
+            orderResult.postValue(Result.error("Order ID không hợp lệ"));
+            return orderResult;
+        }
+        db.collection("orders").document(orderId)
+                .addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        orderResult.postValue(Result.error(e.getMessage()));
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        Order order = snapshot.toObject(Order.class);
+                        orderResult.postValue(Result.success(order));
+                    } else {
+                        orderResult.postValue(Result.error("Không tìm thấy đơn hàng"));
+                    }
+                });
+        return orderResult;
+    }
 }
