@@ -43,10 +43,8 @@ public class AnalyseFragment extends Fragment {
     private PreviewView cameraPreview;
     private ImageView capturedImageView;
     private CardView resultCard;
-    private TextView resultText;
-    private Button captureButton;
-    private Button helpButton;
-    private Button retryButton;
+    private TextView resultText, treatmentText;
+    private Button captureButton, helpButton, retryButton;
 
     private ProcessCameraProvider cameraProvider;
     private ImageCapture imageCapture;
@@ -78,11 +76,16 @@ public class AnalyseFragment extends Fragment {
         captureButton = root.findViewById(R.id.capture_button);
         helpButton = root.findViewById(R.id.help_button);
         retryButton = root.findViewById(R.id.retry_button);
+        treatmentText = root.findViewById(R.id.treatment_text);
 
         // Set up observers
         viewModel.getSkinResult().observe(getViewLifecycleOwner(), result -> {
             resultText.setText("Your skin type: " + result);
             resultCard.setVisibility(View.VISIBLE);
+        });
+
+        viewModel.getTreatmentSchedule().observe(getViewLifecycleOwner(), schedule -> {
+            treatmentText.setText(schedule);
         });
 
         viewModel.getIsProcessing().observe(getViewLifecycleOwner(), isProcessing -> {
@@ -112,7 +115,7 @@ public class AnalyseFragment extends Fragment {
 
     private void showHelp() {
         // Display help information
-        Toast.makeText(requireContext(), 
+        Toast.makeText(requireContext(),
                 "Position your face in the camera and ensure good lighting for accurate results.",
                 Toast.LENGTH_LONG).show();
     }

@@ -2,5 +2,61 @@
     <string name="app_name">Skin Shine</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_notifications">Thông báo</string>
+    <string name="title_profile">Hồ sơ</string>
+    <string name="banner_image_description">Ảnh Banner</string>
+    <string name="product_image_description">Ảnh sản phẩm</string>
+    <string name="featured_products">Sản phẩm nổi bật</string>
+    <string name="profile_hello">Xin chào</string>
+    <string name="profile_hello_description">Đăng nhập để nhận ưu đãi và tra cứu đơn hàng</string>
+    <string name="profile_login_button">Đăng nhập</string>
+
+    <!--    login -->
+    <string name="login_title">ĐĂNG NHẬP</string>
+    <string name="login_subtitle">Bạn nhập thông tin tài khoản bên dưới để đăng nhập nhé!</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_hint">Nhập email</string>
+    <string name="login_password_label">Mật khẩu</string>
+    <string name="login_password_hint">Nhập mật khẩu</string>
+    <string name="login_back_home">← Về trang chủ</string>
+    <string name="login_forgot_password">Quên mật khẩu</string>
+    <string name="login_button">ĐĂNG NHẬP</string>
+    <string name="login_register_prompt">Bạn chưa có tài khoản?</string>
+    <string name="login_register_button">ĐĂNG KÝ NGAY</string>
+    <string name="user_point_placeholder">Điểm của bạn: 0</string>
+    <string name="profile_logout_button">Đăng xuất</string>
+
+    <!--    register-->
+    <string name="register_title">ĐĂNG KÝ</string>
+    <string name="register_go_to_login">Bạn đã có tài khoản? Đăng nhập ngay</string>
+    <string name="register_fullname_label">Họ và tên</string>
+    <string name="register_fullname_hint">Nhập họ và tên</string>
+    <string name="register_email_label">Nhập Email</string>
+    <string name="register_email_hint">Email</string>
+    <string name="register_phone_label">Số điện thoại</string>
+    <string name="register_phone_hint">Nhập số điện thoại</string>
+    <string name="register_password_label">Mật khẩu</string>
+    <string name="register_password_hint">Nhập mật khẩu</string>
+    <string name="register_confirm_password_label">Xác nhận mật khẩu</string>
+    <string name="register_confirm_password_hint">Nhập lại mật khẩu</string>
+    <string name="register_button">ĐĂNG KÝ</string>
+
+    <!-- profile -->
+    <string name="profile_user_default_name">Tên người dùng</string>
+    <string name="profile_user_point_placeholder">Điểm của bạn: 0</string>
+    <string name="profile_user_role_admin">Vai trò: Admin</string>
+    <string name="profile_rewards_button">ƯU ĐÃI CỦA TÔI</string>
+
+    <!-- items support -->
+    <string name="item_support_store">Danh sách cửa hàng</string>
+
+    <!-- product detail -->
+    <string name="product_image">Ảnh sản phẩm</string>
+    <string name="app_logo">App Logo</string>
+    <string name="compare">So sánh</string>
+    <string name="product_name">Tên sản phẩm</string>
+    <string name="brand">Thương hiệu</string>
+    <string name="delete_search">Xóa tìm kiếm</string>
+    <string name="close">Đóng</string>
+    <string name="back">Back</string>
 </resources>
