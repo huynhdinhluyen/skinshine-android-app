@@ -1,5 +1,6 @@
 package com.example.skinshine.ui.splash;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,10 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.skinshine.MainActivity;
 import com.example.skinshine.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+@SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DELAY = 3000;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +38,36 @@ public class SplashActivity extends AppCompatActivity {
                         | android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
                         | android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
-
+        mAuth = FirebaseAuth.getInstance();
         initAnimations();
-        startMainActivityAfterDelay();
+        new Handler(Looper.getMainLooper()).postDelayed(this::checkUserAndNavigate, SPLASH_DELAY);
+    }
+
+    private void checkUserAndNavigate() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            navigateToMainActivity("customer");
+        } else {
+            FirebaseFirestore.getInstance().collection("users").document(currentUser.getUid()).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        String role = "customer";
+                        if (documentSnapshot.exists() && documentSnapshot.getString("role") != null) {
+                            role = documentSnapshot.getString("role");
+                        }
+                        navigateToMainActivity(role);
+                    })
+                    .addOnFailureListener(e -> {
+                        navigateToMainActivity("customer");
+                    });
+        }
+    }
+
+    private void navigateToMainActivity(String userRole) {
+        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        intent.putExtra("USER_ROLE", userRole);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     private void initAnimations() {
@@ -42,26 +75,13 @@ public class SplashActivity extends AppCompatActivity {
         TextView appNameTextView = findViewById(R.id.appNameTextView);
         TextView sloganTextView = findViewById(R.id.sloganTextView);
 
-        // Animation cho logo - scale và fade in
         Animation logoAnimation = AnimationUtils.loadAnimation(this, R.anim.splash_logo_animation);
         logoImageView.startAnimation(logoAnimation);
 
-        // Animation cho tên app - slide từ dưới lên
         Animation appNameAnimation = AnimationUtils.loadAnimation(this, R.anim.splash_text_animation);
         appNameTextView.startAnimation(appNameAnimation);
 
-        // Animation cho slogan - fade in với delay
         Animation sloganAnimation = AnimationUtils.loadAnimation(this, R.anim.splash_slogan_animation);
         sloganTextView.startAnimation(sloganAnimation);
-    }
-
-    private void startMainActivityAfterDelay() {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }, SPLASH_DELAY);
     }
 }

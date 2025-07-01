@@ -148,10 +148,12 @@ public class CheckoutFragment extends Fragment {
                         public void onPaymentSucceeded(String transactionId, String transToken, String appTransID) {
                             viewModel.finalizeSuccessfulPayment(selectedItems);
                         }
+
                         @Override
                         public void onPaymentCanceled(String zpTransToken, String appTransID) {
                             Toast.makeText(getContext(), "Đã hủy thanh toán", Toast.LENGTH_SHORT).show();
                         }
+
                         @Override
                         public void onPaymentError(ZaloPayError zaloPayError, String zpTransToken, String appTransID) {
                             Toast.makeText(getContext(), "Lỗi thanh toán: " + zaloPayError.toString(), Toast.LENGTH_LONG).show();

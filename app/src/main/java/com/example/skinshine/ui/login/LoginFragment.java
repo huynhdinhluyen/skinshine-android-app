@@ -1,5 +1,6 @@
 package com.example.skinshine.ui.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,10 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.skinshine.MainActivity;
 import com.example.skinshine.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
@@ -53,10 +56,9 @@ public class LoginFragment extends Fragment {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-
-                            Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_homeFragment);
+                            // THAY ĐỔI: Thay vì điều hướng, hãy kiểm tra vai trò và khởi động lại MainActivity
+                            checkUserRoleAndNavigate(task.getResult().getUser());
                         } else {
                             Toast.makeText(
                                     getContext(),
@@ -66,8 +68,35 @@ public class LoginFragment extends Fragment {
                     });
         });
 
+
         btnRegister.setOnClickListener(v -> {
             Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_registerFragment);
         });
+    }
+
+    private void checkUserRoleAndNavigate(FirebaseUser user) {
+        if (user == null || getActivity() == null) return;
+
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String role = "customer"; // Mặc định là customer
+                    if (documentSnapshot.exists() && documentSnapshot.getString("role") != null) {
+                        role = documentSnapshot.getString("role");
+                    }
+                    // Khởi động lại MainActivity với vai trò chính xác
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra("USER_ROLE", role);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    getActivity().finish(); // Đóng Activity hiện tại để người dùng không thể quay lại
+                })
+                .addOnFailureListener(e -> {
+                    // Nếu có lỗi, vẫn cho vào vai trò customer để đảm bảo app không bị treo
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra("USER_ROLE", "customer");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    getActivity().finish();
+                });
     }
 }

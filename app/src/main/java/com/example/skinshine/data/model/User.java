@@ -68,6 +68,14 @@ public class User {
         this.point = point;
     }
 
+    public boolean isStaff() {
+        return "staff".equals(role);
+    }
+
+    public boolean isCustomer() {
+        return "customer".equals(role);
+    }
+
     public boolean isAdmin() {
         return "admin".equals(role);
     }
