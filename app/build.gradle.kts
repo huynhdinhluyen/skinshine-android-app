@@ -48,7 +48,7 @@ dependencies {
     implementation(
         fileTree(
             mapOf(
-                "dir" to "C:\\Users\\huynh\\OneDrive\\Desktop\\zalopay-sandbox",
+                "dir" to "C:\\Users\\triba\\Downloads\\zalopay-sandbox",
                 "include" to listOf("*.aar", "*.jar"),
                 "exclude" to listOf("")
             )
@@ -71,4 +71,15 @@ dependencies {
     implementation(libs.squareup.okhttp)
     implementation(libs.commons.codec.commons.codec3)
 
+
+    // CameraX
+    implementation("androidx.camera:camera-core:1.3.2")
+    implementation("androidx.camera:camera-camera2:1.3.2")
+    implementation("androidx.camera:camera-lifecycle:1.3.2")
+    implementation("androidx.camera:camera-view:1.3.2")
+
+    // ONNX Runtime
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
+
+    implementation("com.google.guava:guava:32.1.3-android")
 }

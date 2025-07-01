@@ -118,4 +118,10 @@
         android:name="com.example.skinshine.ui.product.ComparisonBottomSheetFragment"
         android:label="ComparisonBottomSheet"
         tools:layout="@layout/bottom_sheet_product_search" />
+
+    <fragment
+        android:id="@+id/navigation_analyse"
+        android:name="com.example.skinshine.ui.analyse.AnalyseFragment"
+        android:label="Analyse"
+        tools:layout="@layout/fragment_analyse" />
 </navigation>
