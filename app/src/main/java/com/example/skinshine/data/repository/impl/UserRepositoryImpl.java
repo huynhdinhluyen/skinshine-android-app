@@ -13,6 +13,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
     private static final String TAG = "UserRepository";
@@ -89,6 +93,60 @@ public class UserRepositoryImpl implements UserRepository {
         attachCurrentUserListener();
     }
 
+    @Override
+    public LiveData<Result<List<User>>> getAllCustomers() {
+        MutableLiveData<Result<List<User>>> customersLiveData = new MutableLiveData<>();
+        customersLiveData.setValue(Result.loading());
+
+        db.collection("users")
+                .whereEqualTo("role", "customer")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null) {
+                        customersLiveData.setValue(Result.error(e.getMessage()));
+                        return;
+                    }
+
+                    if (queryDocumentSnapshots != null) {
+                        List<User> customers = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            User customer = parseUser(document);
+                            customers.add(customer);
+                        }
+                    }
+                });
+
+        return customersLiveData;
+    }
+
+    @Override
+    public LiveData<Result<List<User>>> searchCustomers(String query) {
+        MutableLiveData<Result<List<User>>> searchResult = new MutableLiveData<>();
+        searchResult.setValue(Result.loading());
+
+        if (query == null || query.trim().isEmpty()) {
+            return getAllCustomers();
+        }
+
+        String searchQuery = query.toLowerCase().trim();
+
+        db.collection("users")
+                .whereEqualTo("role", "customer")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<User> filteredCustomers = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        User customer = parseUser(document);
+
+                        if (matchesSearchQuery(customer, searchQuery)) {
+                            filteredCustomers.add(customer);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> searchResult.setValue(Result.error(e.getMessage())));
+
+        return searchResult;
+    }
+
     private void attachCurrentUserListener() {
         FirebaseUser currentUser = auth.getCurrentUser();
 
@@ -126,6 +184,12 @@ public class UserRepositoryImpl implements UserRepository {
                         currentUserLiveData.setValue(Result.error("User data not found"));
                     }
                 });
+    }
+
+    private boolean matchesSearchQuery(User customer, String searchQuery) {
+        return (customer.getEmail() != null && customer.getEmail().toLowerCase().contains(searchQuery)) ||
+                (customer.getPhone() != null && customer.getPhone().contains(searchQuery)) ||
+                (customer.getName() != null && customer.getName().toLowerCase().contains(searchQuery));
     }
 
     private User parseUser(DocumentSnapshot doc) {
