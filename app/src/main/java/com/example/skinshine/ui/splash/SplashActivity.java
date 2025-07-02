@@ -14,15 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.skinshine.MainActivity;
 import com.example.skinshine.R;
+import com.example.skinshine.data.repository.AuthRepository;
+import com.example.skinshine.data.repository.impl.AuthRepositoryImpl;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
+    private static final String TAG = "SplashActivity";
     private static final int SPLASH_DELAY = 3000;
     private FirebaseAuth mAuth;
+    private AuthRepository authRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +41,11 @@ public class SplashActivity extends AppCompatActivity {
                         | android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
                         | android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
+
         mAuth = FirebaseAuth.getInstance();
+        authRepository = new AuthRepositoryImpl();
         initAnimations();
+
         new Handler(Looper.getMainLooper()).postDelayed(this::checkUserAndNavigate, SPLASH_DELAY);
     }
 
@@ -48,23 +54,25 @@ public class SplashActivity extends AppCompatActivity {
         if (currentUser == null) {
             navigateToMainActivity("customer");
         } else {
-            FirebaseFirestore.getInstance().collection("users").document(currentUser.getUid()).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        String role = "customer";
-                        if (documentSnapshot.exists() && documentSnapshot.getString("role") != null) {
-                            role = documentSnapshot.getString("role");
-                        }
-                        navigateToMainActivity(role);
-                    })
-                    .addOnFailureListener(e -> {
-                        navigateToMainActivity("customer");
-                    });
+            getUserRoleFromRepository(currentUser.getUid());
         }
+    }
+
+    private void getUserRoleFromRepository(String userId) {
+        authRepository.getCurrentUserRole().observe(this, result -> {
+            if (result.isSuccess()) {
+                String role = result.getData();
+                navigateToMainActivity(role);
+            } else {
+                navigateToMainActivity("customer");
+            }
+        });
     }
 
     private void navigateToMainActivity(String userRole) {
         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
         intent.putExtra("USER_ROLE", userRole);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
