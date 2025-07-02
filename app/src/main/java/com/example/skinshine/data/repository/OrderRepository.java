@@ -17,4 +17,6 @@ public interface OrderRepository {
     LiveData<Result<List<Order>>> getAllOrders();
 
     LiveData<Result<Order>> getOrderById(String orderId);
+
+    LiveData<Result<List<Order>>> getOrdersByUserId(String userId);
 }

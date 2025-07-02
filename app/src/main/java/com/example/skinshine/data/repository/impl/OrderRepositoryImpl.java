@@ -9,7 +9,9 @@ import com.example.skinshine.data.repository.OrderRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderRepositoryImpl implements OrderRepository {
@@ -104,5 +106,40 @@ public class OrderRepositoryImpl implements OrderRepository {
                     }
                 });
         return orderResult;
+    }
+
+    @Override
+    public LiveData<Result<List<Order>>> getOrdersByUserId(String userId) {
+        MutableLiveData<Result<List<Order>>> ordersResult = new MutableLiveData<>();
+        ordersResult.setValue(Result.loading());
+
+        if (userId == null || userId.isEmpty()) {
+            ordersResult.setValue(Result.error("User ID không hợp lệ"));
+            return ordersResult;
+        }
+
+        db.collection("orders")
+                .whereEqualTo("userId", userId)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        ordersResult.setValue(Result.error(e.getMessage()));
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        List<Order> orders = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : snapshots) {
+                            Order order = document.toObject(Order.class);
+                            order.setId(document.getId());
+                            orders.add(order);
+                        }
+                        ordersResult.setValue(Result.success(orders));
+                    } else {
+                        ordersResult.setValue(Result.success(new ArrayList<>()));
+                    }
+                });
+
+        return ordersResult;
     }
 }
