@@ -9,7 +9,7 @@
         android:id="@+id/analyse_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Skin Analysis"
+        android:text="Phân tích da"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@color/primary_green"
@@ -70,9 +70,10 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="CAPTURE"
+            android:background="@color/primary_green"
+            android:text="Chụp ảnh"
             android:textAllCaps="true"
-            android:textColor="@color/primary_green" />
+            android:textColor="@color/textColorPrimary" />
 
         <Space
             android:layout_width="12dp"
@@ -84,9 +85,10 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="HELP"
+            android:background="@color/primary_green"
+            android:text="Trợ giúp"
             android:textAllCaps="true"
-            android:textColor="@color/primary_green" />
+            android:textColor="@color/textColorPrimary" />
 
         <Space
             android:layout_width="12dp"

@@ -37,8 +37,8 @@ public class SkinResultFragment extends Fragment {
 
         Bundle args = getArguments();
         if (args != null) {
-            String skinType = args.getString(ARG_SKIN_TYPE, "Unknown");
-            String treatment = args.getString(ARG_TREATMENT, "No schedule available.");
+            String skinType = args.getString(ARG_SKIN_TYPE, "Không xác định");
+            String treatment = args.getString(ARG_TREATMENT, "Không có lộ trình phù hợp.");
             skinTypeText.setText("Skin Type: " + skinType);
             treatmentText.setText(treatment);
         }
