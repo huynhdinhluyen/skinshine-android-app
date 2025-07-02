@@ -80,7 +80,7 @@ public class AnalyseFragment extends Fragment {
 
         // Set up observers
         viewModel.getSkinResult().observe(getViewLifecycleOwner(), result -> {
-            resultText.setText("Your skin type: " + result);
+            resultText.setText("Loại da của bạn: " + result);
             resultCard.setVisibility(View.VISIBLE);
         });
 
@@ -91,7 +91,7 @@ public class AnalyseFragment extends Fragment {
         viewModel.getIsProcessing().observe(getViewLifecycleOwner(), isProcessing -> {
             captureButton.setEnabled(!isProcessing);
             helpButton.setEnabled(!isProcessing);
-            captureButton.setText(isProcessing ? "ANALYZING..." : "CAPTURE");
+            captureButton.setText(isProcessing ? "Đang phân tích..." : "Chụp ảnh");
         });
 
         // Set up button click listeners
@@ -116,7 +116,7 @@ public class AnalyseFragment extends Fragment {
     private void showHelp() {
         // Display help information
         Toast.makeText(requireContext(),
-                "Position your face in the camera and ensure good lighting for accurate results.",
+                "Đảm bảo camera thấy cả gương mặt và điều kiện ánh sáng tốt để có kết quả chính xác hơn.",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -129,8 +129,8 @@ public class AnalyseFragment extends Fragment {
                 cameraProvider = cameraProviderFuture.get();
                 bindCameraUseCase();
             } catch (ExecutionException | InterruptedException e) {
-                Log.e(TAG, "Error setting up camera", e);
-                Toast.makeText(getContext(), "Error setting up camera: " + e.getMessage(),
+                Log.e(TAG, "Có lỗi xảy ra khi cấu hình camera", e);
+                Toast.makeText(getContext(), "Có lỗi xảy ra khi cấu hình camera: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
         }, ContextCompat.getMainExecutor(requireContext()));
@@ -161,8 +161,8 @@ public class AnalyseFragment extends Fragment {
             cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture);
         } catch (Exception e) {
-            Log.e(TAG, "Error binding camera use cases", e);
-            Toast.makeText(getContext(), "Error binding camera: " + e.getMessage(),
+            Log.e(TAG, "Có lỗi xảy ra khi cấu hình camera", e);
+            Toast.makeText(getContext(), "Có lỗi xảy ra khi cấu hình camera: " + e.getMessage(),
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -195,8 +195,8 @@ public class AnalyseFragment extends Fragment {
                             // Process image with ONNX model
                             viewModel.processSkinImage(bitmap);
                         } catch (Exception e) {
-                            Log.e(TAG, "Error processing captured image", e);
-                            Toast.makeText(getContext(), "Error processing image: " + e.getMessage(),
+                            Log.e(TAG, "Có lỗi xảy ra khi xử lý ảnh:", e);
+                            Toast.makeText(getContext(), "Có lỗi xảy ra khi xử lý ảnh: " + e.getMessage(),
                                     Toast.LENGTH_SHORT).show();
                             viewModel.setProcessing(false);
                         } finally {
@@ -207,8 +207,8 @@ public class AnalyseFragment extends Fragment {
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
-                        Log.e(TAG, "Error capturing image", exception);
-                        Toast.makeText(getContext(), "Error capturing image: " +
+                        Log.e(TAG, "Có lỗi xảy ra khi chụp ảnh", exception);
+                        Toast.makeText(getContext(), "Có lỗi xảy ra khi chụp ảnh: " +
                                 exception.getMessage(), Toast.LENGTH_SHORT).show();
                         viewModel.setProcessing(false);
                     }

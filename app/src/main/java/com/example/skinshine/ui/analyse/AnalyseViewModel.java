@@ -33,24 +33,25 @@ public class AnalyseViewModel extends ViewModel {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private final String[] skinTypes = {
-            "Normal", "Dry", "Oily", "Acne", "Blackheads", "Wrinkles", "Dark Spots"
+//            "Normal", "Dry", "Oily", "Acne", "Blackheads", "Wrinkles", "Dark Spots"
+            "Bình thường", "Khô", "Da dầu", "Mụn trứng cá", "Mụn đầu đen", "Nếp nhăn", "Đốm đen"
     };
 
     private final String[] treatmentSchedules = {
-            // Normal
-            "Maintain a balanced routine: gentle cleanser, moisturizer, sunscreen. Exfoliate 1-2x/week.",
-            // Dry
-            "Use hydrating cleanser, rich moisturizer, avoid hot water. Apply hyaluronic acid and use sunscreen.",
-            // Oily
-            "Cleanse twice daily, use oil-free moisturizer, non-comedogenic sunscreen. Exfoliate 2x/week.",
-            // Acne
-            "Use gentle cleanser, salicylic acid or benzoyl peroxide treatments, oil-free moisturizer, sunscreen.",
-            // Blackheads
-            "Cleanse with salicylic acid, exfoliate regularly, use clay masks, non-comedogenic products.",
-            // Wrinkles
-            "Apply retinoids at night, use antioxidant serum, moisturizer, and broad-spectrum sunscreen daily.",
-            // Dark Spots
-            "Use vitamin C serum, sunscreen daily, gentle exfoliation, consider niacinamide or licorice extract."
+            // Bình thường
+            "Duy trì thói quen cân bằng: sữa rửa mặt dịu nhẹ, kem dưỡng ẩm, kem chống nắng. Tẩy tế bào chết 1-2 lần/tuần.",
+            // Khô
+            "Sử dụng sữa rửa mặt dưỡng ẩm, kem dưỡng ẩm giàu dưỡng chất, tránh nước nóng. Thoa axit hyaluronic và sử dụng kem chống nắng.",
+            // Da dầu
+            "Rửa mặt hai lần mỗi ngày, sử dụng kem dưỡng ẩm không chứa dầu, kem chống nắng không gây mụn. Tẩy tế bào chết 2 lần/tuần.",
+            // Mụn trứng cá
+            "Sử dụng sữa rửa mặt dịu nhẹ, phương pháp điều trị bằng axit salicylic hoặc benzoyl peroxide, kem dưỡng ẩm không chứa dầu, kem chống nắng.",
+            // Mụn đầu đen
+            "Rửa mặt bằng axit salicylic, tẩy tế bào chết thường xuyên, sử dụng mặt nạ đất sét, các sản phẩm không gây mụn.",
+            // Nếp nhăn
+            "Thoa retinoid vào ban đêm, sử dụng huyết thanh chống oxy hóa, kem dưỡng ẩm và kem chống nắng phổ rộng hàng ngày.",
+            // Đốm đen
+            "Sử dụng huyết thanh vitamin C, kem chống nắng hàng ngày, tẩy tế bào chết nhẹ nhàng, cân nhắc sử dụng niacinamide hoặc chiết xuất cam thảo."
     };
 
     private OrtEnvironment ortEnvironment;
@@ -90,9 +91,9 @@ public class AnalyseViewModel extends ViewModel {
 
                 mainHandler.post(() -> modelLoaded = true);
             } catch (IOException | OrtException e) {
-                Log.e(TAG, "Error loading model", e);
+                Log.e(TAG, "Có lỗi xảy ra khi tải model", e);
                 mainHandler.post(() -> {
-                    skinResult.setValue("Error loading model: " + e.getMessage());
+                    skinResult.setValue("Có lỗi xảy ra khi tải model: " + e.getMessage());
                     treatmentSchedule.setValue("");
                     isProcessing.setValue(false);
                 });
@@ -118,7 +119,7 @@ public class AnalyseViewModel extends ViewModel {
         executorService.execute(() -> {
             try {
                 if (!modelLoaded || ortSession == null) {
-                    throw new IllegalStateException("Model not loaded");
+                    throw new IllegalStateException("Không tải được model");
                 }
 
                 float[] inputData = preprocessBitmap(bitmap, 224, 224);
@@ -141,9 +142,9 @@ public class AnalyseViewModel extends ViewModel {
                 inputTensor.close();
                 result.close();
             } catch (Exception e) {
-                Log.e(TAG, "Error analyzing skin image", e);
+                Log.e(TAG, "Có lỗi xảy ra khi phaân tích hình ảnh:", e);
                 mainHandler.post(() -> {
-                    skinResult.setValue("Error analyzing skin: " + e.getMessage());
+                    skinResult.setValue("Có lỗi xảy ra khi phaân tích hình ảnh: " + e.getMessage());
                     treatmentSchedule.setValue("");
                     isProcessing.setValue(false);
                 });
@@ -192,7 +193,7 @@ public class AnalyseViewModel extends ViewModel {
             try {
                 ortSession.close();
             } catch (OrtException e) {
-                Log.e(TAG, "Error closing ONNX session", e);
+                Log.e(TAG, "Có lỗi xảy ra khi đóng tiến trình ONNX", e);
             }
         }
         if (ortEnvironment != null) {
