@@ -4,6 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
+    <action
+        android:id="@+id/action_global_staffOrderDetailFragment"
+        app:destination="@id/staffOrderDetailFragment" />
+
+    <action
+        android:id="@+id/action_global_customerOrdersFragment"
+        app:destination="@id/customerOrdersFragment" />
+    <fragment
+        android:id="@+id/navigation_staff_dashboard"
+        android:name="com.example.skinshine.ui.staff.dashboard.StaffDashboardFragment"
+        android:label="Tổng quan"
+        tools:layout="@layout/fragment_staff_dashboard">
+
+        <action
+            android:id="@+id/action_staffDashboardFragment_to_staffOrderDetailFragment"
+            app:destination="@id/staffOrderDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.skinshine.ui.home.HomeFragment"
@@ -122,4 +139,42 @@
         android:name="com.example.skinshine.ui.analyse.AnalyseFragment"
         android:label="Analyse"
         tools:layout="@layout/fragment_analyse" />
+
+    <fragment
+        android:id="@+id/navigation_staff_orders"
+        android:name="com.example.skinshine.ui.staff.orders.StaffOrdersFragment"
+        android:label="Đơn hàng"
+        tools:layout="@layout/fragment_staff_orders" />
+
+    <fragment
+        android:id="@+id/navigation_staff_customers"
+        android:name="com.example.skinshine.ui.staff.customers.StaffCustomersFragment"
+        android:label="Khách hàng"
+        tools:layout="@layout/fragment_staff_customers" />
+
+    <fragment
+        android:id="@+id/navigation_staff_inventory"
+        android:name="com.example.skinshine.ui.staff.inventory.StaffInventoryFragment"
+        android:label="Kho hàng"
+        tools:layout="@layout/fragment_staff_inventory" />
+
+    <fragment
+        android:id="@+id/staffOrderDetailFragment"
+        android:name="com.example.skinshine.ui.staff.order_detail.StaffOrderDetailFragment"
+        android:label="Chi tiết đơn hàng"
+        tools:layout="@layout/fragment_staff_order_detail">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/customerOrdersFragment"
+        android:name="com.example.skinshine.ui.staff.customers.CustomerOrdersFragment"
+        android:label="Lịch sử đơn hàng"
+        tools:layout="@layout/fragment_customer_orders">
+        <argument
+            android:name="customerId"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -119,6 +119,12 @@ public class CartViewModel extends ViewModel {
         });
     }
 
+    public void refreshCartItems() {
+        if (cartRepository instanceof CartRepositoryImpl) {
+            ((CartRepositoryImpl) cartRepository).refreshCart();
+        }
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
