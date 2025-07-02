@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowInsetsController;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -26,11 +25,11 @@ import com.google.firebase.auth.FirebaseUser;
 import vn.zalopay.sdk.ZaloPaySDK;
 
 public class MainActivity extends AppCompatActivity {
-
     private ActivityMainBinding binding;
     private CartViewModel cartViewModel;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseAuth mAuth;
+    private String currentUserRole = "customer"; // Default role
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,36 +43,81 @@ public class MainActivity extends AppCompatActivity {
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         mAuth = FirebaseAuth.getInstance();
 
+        // XỬ LÝ ROLE TỪ INTENT TRƯỚC KHI SETUP NAVIGATION
+        handleUserRoleFromIntent();
+
+        setupNavigation();
+        setupAuthStateListener();
+
+        // Initialize ZaloPay SDK
+        ZaloPaySDK.init(2553, vn.zalopay.sdk.Environment.SANDBOX);
+    }
+
+    private void handleUserRoleFromIntent() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("USER_ROLE")) {
+            String roleFromIntent = intent.getStringExtra("USER_ROLE");
+            currentUserRole = roleFromIntent != null ? roleFromIntent : "customer";
+        } else {
+            currentUserRole = "customer";
+        }
+    }
+
+    private void setupNavigation() {
         BottomNavigationView navView = findViewById(R.id.nav_view);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home,
-                R.id.navigation_category,
-                R.id.navigation_analyse,
-                R.id.navigation_order_history,
-                R.id.navigation_notifications
-        ).build();
+        if ("staff".equals(currentUserRole)) {
+            navView.getMenu().clear();
+            navView.inflateMenu(R.menu.staff_bottom_nav_menu);
 
-        NavController navController = Navigation.findNavController(this,
-                R.id.nav_host_fragment_activity_main);
+            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.navigation_staff_dashboard,
+                    R.id.navigation_staff_orders,
+                    R.id.navigation_staff_customers,
+                    R.id.navigation_staff_inventory,
+                    R.id.navigation_member)
+                    .build();
 
-        NavigationUI.setupWithNavController(navView, navController);
+            NavigationUI.setupWithNavController(navView, navController);
 
+            // Navigate to staff dashboard
+            navController.navigate(R.id.navigation_staff_dashboard);
+
+        } else {
+            // Setup cho Customer
+            navView.getMenu().clear();
+            navView.inflateMenu(R.menu.bottom_nav_menu);
+
+            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.navigation_home,
+                    R.id.navigation_category,
+                    R.id.navigation_analyse,
+                    R.id.navigation_order_history,
+                    R.id.navigation_member)
+                    .build();
+
+            NavigationUI.setupWithNavController(navView, navController);
+
+            // Navigate to home
+            navController.navigate(R.id.navigation_home);
+        }
+
+        // Handle destination changes để ẩn/hiện bottom nav
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.loginFragment ||
                     destination.getId() == R.id.registerFragment ||
                     destination.getId() == R.id.cartFragment ||
-                    destination.getId() == R.id.registerFragment ||
                     destination.getId() == R.id.productDetailFragment ||
                     destination.getId() == R.id.productComparisonFragment ||
-                    destination.getId() == R.id.checkoutFragment
-            ) {
+                    destination.getId() == R.id.checkoutFragment ||
+                    destination.getId() == R.id.staffOrderDetailFragment ||
+                    destination.getId() == R.id.customerOrdersFragment) {
                 navView.setVisibility(View.GONE);
             } else {
                 navView.setVisibility(View.VISIBLE);
             }
         });
-        setupAuthStateListener();
     }
 
     private void setupSystemBars() {
@@ -98,10 +142,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupAuthStateListener() {
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+        authStateListener = firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user == null) {
+                currentUserRole = "customer";
+                setupNavigation();
             }
         };
     }
@@ -130,6 +175,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
+        handleUserRoleFromIntent();
+        setupNavigation();
         ZaloPaySDK.getInstance().onResult(intent);
     }
 }
