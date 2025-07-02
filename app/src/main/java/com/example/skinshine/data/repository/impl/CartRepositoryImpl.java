@@ -42,6 +42,7 @@ public class CartRepositoryImpl implements CartRepository {
             cartItemsLiveData.setValue(new ArrayList<>());
             return;
         }
+        detachListener();
 
         String userId = auth.getCurrentUser().getUid();
         if (cartListener != null) {
@@ -197,10 +198,20 @@ public class CartRepositoryImpl implements CartRepository {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
+    @Override
+    public void refreshCart() {
+        detachListener();
+        attachCartListener();
+    }
+
     public void detachListener() {
         if (cartListener != null) {
             cartListener.remove();
             cartListener = null;
         }
+    }
+
+    public void onAuthStateChanged() {
+        attachCartListener();
     }
 }
