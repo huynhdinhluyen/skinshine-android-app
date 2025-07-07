@@ -14,6 +14,7 @@ import com.example.skinshine.ui.register.RegisterActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -59,12 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                             btnLoginConfirm.setText("ĐĂNG NHẬP");
 
                             if (task.isSuccessful()) {
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(this, MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
+                                checkUserRoleAndNavigate(task.getResult().getUser());
                             } else {
                                 Toast.makeText(this,
                                         "Đăng nhập thất bại: " + task.getException().getMessage(),
@@ -80,5 +76,30 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+    }
+
+    private void checkUserRoleAndNavigate(FirebaseUser user) {
+        FirebaseFirestore.getInstance().collection("users").document(user.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String role = "customer"; // Mặc định là customer
+                    if (documentSnapshot.exists()) {
+                        role = documentSnapshot.getString("role");
+                    }
+                    Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.putExtra("USER_ROLE", role); // Gửi role qua Intent
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    // Nếu lỗi, vẫn cho vào vai trò customer
+                    Toast.makeText(this, "Đăng nhập thành công (không thể lấy vai trò)!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.putExtra("USER_ROLE", "customer");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                });
     }
 }

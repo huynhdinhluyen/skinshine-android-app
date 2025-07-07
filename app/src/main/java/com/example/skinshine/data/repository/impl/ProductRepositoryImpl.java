@@ -151,6 +151,33 @@ public class ProductRepositoryImpl implements ProductRepository {
         attachProductsListener();
     }
 
+    @Override
+    public LiveData<Result<List<Product>>> getProductsByCategory(String categoryId) {
+        MutableLiveData<Result<List<Product>>> productsLiveData = new MutableLiveData<>();
+        productsLiveData.setValue(Result.loading());
+
+        if ("all".equals(categoryId)) {
+            return getProducts();
+        }
+
+        db.collection("products")
+                .whereEqualTo("is_active", true)
+                .whereEqualTo("categoryId", categoryId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Product> products = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Product product = document.toObject(Product.class);
+                        product.setId(document.getId());
+                        products.add(product);
+                    }
+                    productsLiveData.setValue(Result.success(products));
+                })
+                .addOnFailureListener(e -> productsLiveData.setValue(Result.error(e.getMessage())));
+
+        return productsLiveData;
+    }
+
     private void attachProductsListener() {
         if (productsListener != null) {
             productsListener.remove();

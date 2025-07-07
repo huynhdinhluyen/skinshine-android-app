@@ -13,13 +13,76 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Lịch sử đơn hàng" />
+        app:title="Lịch sử đơn hàng"
+        app:titleTextColor="#2E2E2E" />
 
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/ic_history"
+            app:tint="#CCCCCC" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Chưa có đơn hàng nào"
+            android:textColor="#2E2E2E"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Hãy đặt hàng để xem lịch sử đơn hàng của bạn"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Loading State -->
+    <LinearLayout
+        android:id="@+id/loadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang tải lịch sử đơn hàng..."
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Orders List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerOrderHistory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
         android:clipToPadding="false"
-        android:layout_marginBottom="60dp"
-        android:padding="8dp" />
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp" />
+
 </LinearLayout>

@@ -19,6 +19,8 @@ public interface CartRepository {
 
     void clearCart(CartCallback callback);
 
+    void refreshCart();
+
     interface CartCallback {
         void onSuccess();
 

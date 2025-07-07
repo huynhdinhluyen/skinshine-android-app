@@ -9,6 +9,14 @@ import java.util.List;
 
 public interface OrderRepository {
     LiveData<Result<String>> createOrder(Order order);
+
     LiveData<Result<Void>> updateOrderStatus(String orderId, String status);
+
     LiveData<Result<List<Order>>> getOrdersForCurrentUser();
+
+    LiveData<Result<List<Order>>> getAllOrders();
+
+    LiveData<Result<Order>> getOrderById(String orderId);
+
+    LiveData<Result<List<Order>>> getOrdersByUserId(String userId);
 }

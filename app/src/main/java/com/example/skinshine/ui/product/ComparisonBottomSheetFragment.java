@@ -45,10 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComparisonBottomSheetFragment extends BottomSheetDialogFragment {
-    private static final String TAG = "ComparisonBottomSheet";
     public static final String REQUEST_KEY = "comparison_request";
     public static final String KEY_PRODUCT_ID = "selected_product_id";
-
+    private static final String TAG = "ComparisonBottomSheet";
     private ProductComparisonViewModel viewModel;
     private ProductSearchAdapter adapter;
     private PlaceholderManager placeholderManager;
