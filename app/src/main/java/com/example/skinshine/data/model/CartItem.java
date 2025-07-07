@@ -6,22 +6,12 @@ import android.os.Parcelable;
 import com.google.firebase.firestore.Exclude;
 
 public class CartItem implements Parcelable {
-    public static final Creator<CartItem> CREATOR = new Creator<CartItem>() {
-        @Override
-        public CartItem createFromParcel(Parcel in) {
-            return new CartItem(in);
-        }
-
-        @Override
-        public CartItem[] newArray(int size) {
-            return new CartItem[size];
-        }
-    };
     private String productId;
     private String productName;
     private String imageUrl;
     private int quantity;
     private double price;
+
     @Exclude
     private boolean selected = false;
 
@@ -59,6 +49,18 @@ public class CartItem implements Parcelable {
     public int describeContents() {
         return 0;
     }
+
+    public static final Creator<CartItem> CREATOR = new Creator<CartItem>() {
+        @Override
+        public CartItem createFromParcel(Parcel in) {
+            return new CartItem(in);
+        }
+
+        @Override
+        public CartItem[] newArray(int size) {
+            return new CartItem[size];
+        }
+    };
 
     public boolean isSelected() {
         return selected;

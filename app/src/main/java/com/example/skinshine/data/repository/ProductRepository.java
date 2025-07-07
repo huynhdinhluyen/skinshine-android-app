@@ -17,6 +17,4 @@ public interface ProductRepository {
     LiveData<List<String>> getProductNames();
 
     void refreshProducts();
-
-    LiveData<Result<List<Product>>> getProductsByCategory(String categoryId);
 }

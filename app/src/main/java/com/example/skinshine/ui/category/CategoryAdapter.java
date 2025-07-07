@@ -16,18 +16,13 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<Category> categoryList;
+    private final List<Category> categoryList;
     private final OnCategoryClickListener listener;
     private int selectedPosition = 0;
 
     public CategoryAdapter(List<Category> categoryList, OnCategoryClickListener listener) {
         this.categoryList = categoryList;
         this.listener = listener;
-    }
-
-    public void updateCategories(List<Category> newCategories) {
-        this.categoryList = newCategories;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -60,7 +55,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public int getItemCount() {
-        return categoryList != null ? categoryList.size() : 0; // Add null check
+        return categoryList.size();
     }
 
     public interface OnCategoryClickListener {

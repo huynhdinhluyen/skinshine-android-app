@@ -7,7 +7,6 @@ import android.widget.EditText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 public class PlaceholderManager {
     private static final int PLACEHOLDER_INTERVAL = 4000;
 

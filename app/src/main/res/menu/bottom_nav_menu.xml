@@ -11,9 +11,9 @@
         android:title="Danh mục" />
 
     <item
-        android:id="@+id/navigation_analyse"
-        android:icon="@drawable/ic_analyse"
-        android:title="Analyse" />
+        android:id="@+id/navigation_quiz"
+        android:icon="@drawable/ic_quiz"
+        android:title="Quiz" />
 
     <item
         android:id="@+id/navigation_order_history"

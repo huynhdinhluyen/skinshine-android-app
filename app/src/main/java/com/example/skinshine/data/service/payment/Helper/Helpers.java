@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import com.example.skinshine.data.service.payment.Helper.HMac.HMacUtil;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -17,7 +16,7 @@ public class Helpers {
 
     @NotNull
     @SuppressLint("DefaultLocale")
-    public static String getAppTransId() {
+     public static String getAppTransId() {
         if (transIdDefault >= 100000) {
             transIdDefault = 1;
         }
@@ -31,5 +30,5 @@ public class Helpers {
     @NotNull
     public static String getMac(@NotNull String key, @NotNull String data) throws NoSuchAlgorithmException, InvalidKeyException {
         return Objects.requireNonNull(HMacUtil.HMacHexStringEncode(HMacUtil.HMACSHA256, key, data));
-    }
+     }
 }

@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
-    tools:context=".ui.home.HomeFragment"
-    android:fitsSystemWindows="false">
+    tools:context=".ui.home.HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -49,8 +48,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/featured_products"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:textColor="@color/colorPrimaryDark" />
+                android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewProducts"

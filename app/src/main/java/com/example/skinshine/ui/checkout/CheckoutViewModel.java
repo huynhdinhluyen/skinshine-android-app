@@ -91,7 +91,6 @@ public class CheckoutViewModel extends ViewModel {
                     public void onSuccess() {
                         _postPaymentResult.postValue(Result.success(null));
                     }
-
                     @Override
                     public void onError(String error) {
                         _postPaymentResult.postValue(Result.success(null));
