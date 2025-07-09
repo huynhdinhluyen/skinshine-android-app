@@ -82,6 +82,16 @@ public class ProfileFragment extends Fragment {
         return items;
     }
 
+    private List<SupportItem> createAdminSupportItems() {
+        List<SupportItem> items = new ArrayList<>();
+        items.add(new SupportItem(R.drawable.ic_dashboard, "Dashboard"));
+        items.add(new SupportItem(R.drawable.ic_edit_profile, "Chỉnh sửa hồ sơ"));
+        items.add(new SupportItem(R.drawable.ic_history, "Lịch sử đơn hàng"));
+        items.add(new SupportItem(R.drawable.ic_blog, "SkinShine Blog"));
+        items.add(new SupportItem(R.drawable.ic_faq, "FAQ"));
+        return items;
+    }
+
     private void setupClickListeners() {
         btnLogin.setOnClickListener(v -> navigateToLogin());
         btnLogout.setOnClickListener(v -> {
@@ -136,12 +146,21 @@ public class ProfileFragment extends Fragment {
             tvUserRole.setText("Admin");
             tvUserPoint.setVisibility(View.GONE);
 
-            // Show admin welcome message only once
+            // Update RecyclerView with admin items
+            List<SupportItem> adminItems = createAdminSupportItems();
+            supportAdapter = new SupportAdapter(adminItems, this::onSupportItemClick);
+            recyclerView.setAdapter(supportAdapter);
+
             if (getContext() != null) {
                 Toast.makeText(getContext(), "Xin chào Admin!", Toast.LENGTH_SHORT).show();
             }
         } else {
             tvUserRole.setVisibility(View.GONE);
+
+            // Use regular items for non-admin users
+            List<SupportItem> regularItems = createSupportItems();
+            supportAdapter = new SupportAdapter(regularItems, this::onSupportItemClick);
+            recyclerView.setAdapter(supportAdapter);
 
             if (user.getPoint() != null) {
                 tvUserPoint.setVisibility(View.VISIBLE);
@@ -172,6 +191,13 @@ public class ProfileFragment extends Fragment {
 
     private void onSupportItemClick(SupportItem item) {
         switch (item.getTitle()) {
+            case "Dashboard":
+                try {
+                    Navigation.findNavController(requireView()).navigate(R.id.action_profileFragment_to_adminFragment);
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Không thể mở Dashboard", Toast.LENGTH_SHORT).show();
+                }
+                break;
             case "SkinShine Blog":
                 Toast.makeText(getContext(), "Chức năng Blog đang được phát triển", Toast.LENGTH_SHORT).show();
                 break;

@@ -48,7 +48,7 @@ dependencies {
     implementation(
         fileTree(
             mapOf(
-                "dir" to "C:\\Users\\huynh\\OneDrive\\Desktop\\zalopay-sandbox",
+                "dir" to "C:\\Users\\triba\\Downloads\\zalopay-sandbox",
                 "include" to listOf("*.aar", "*.jar"),
                 "exclude" to listOf("")
             )
@@ -82,4 +82,9 @@ dependencies {
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
 
     implementation("com.google.guava:guava:32.1.3-android")
+
+    // Chart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("androidx.cardview:cardview:1.0.0")
+
 }
