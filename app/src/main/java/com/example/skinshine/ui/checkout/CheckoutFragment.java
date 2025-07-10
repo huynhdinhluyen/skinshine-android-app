@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.skinshine.R;
 import com.example.skinshine.data.model.CartItem;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class CheckoutFragment extends Fragment {
     private MaterialToolbar toolbar;
     private CheckoutAdapter adapter;
     private List<CartItem> selectedItems = new ArrayList<>();
+    private TextInputEditText editTextAddress;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +56,9 @@ public class CheckoutFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_checkout, container, false);
+        View view = inflater.inflate(R.layout.fragment_checkout, container, false);
+        editTextAddress = view.findViewById(R.id.editTextAddress);
+        return view;
     }
 
     @Override
@@ -128,7 +132,12 @@ public class CheckoutFragment extends Fragment {
     private void setupClickListeners() {
         btnPlaceOrder.setOnClickListener(v -> {
             if (selectedItems != null && !selectedItems.isEmpty()) {
-                viewModel.placeOrderAndRequestPayment(selectedItems, "ZALOPAY");
+                String address = editTextAddress.getText() != null ? editTextAddress.getText().toString().trim() : "";
+                if (address.isEmpty()) {
+                    editTextAddress.setError("Vui lòng nhập địa chỉ giao hàng");
+                    return;
+                }
+                viewModel.placeOrderAndRequestPayment(selectedItems, "ZALOPAY", address);
             }
         });
     }
