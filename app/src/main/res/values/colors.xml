@@ -7,4 +7,20 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="colorPrimary">#A8D8B9</color> <!-- Mint Green -->
+    <color name="colorPrimaryDark">#82C09A</color> <!-- Darker Mint Green -->
+    <color name="colorAccent">#FFDAC1</color> <!-- Light Peach -->
+    <color name="colorBackground">#FFF9F0</color> <!-- Light Cream -->
+    <color name="textColorPrimary">#4A4A4A</color> <!-- Dark Grey -->
+    <color name="textColorSecondary">#757575</color> <!-- Medium Grey -->
+    <color name="dividerColor">#E0E0E0</color> <!-- Light Grey for dividers -->
+    <color name="placeholder_bg">#DDDDDD</color>
+    <color name="gray_200">#EEEEEE</color>
+
+    <!-- App colors -->
+    <color name="primary_green">#A8D8B9</color>
+    <color name="primary_green_dark">#7BB68A</color>
+    <color name="background_light">#FFF9F0</color>
+    <color name="accent_orange">#FFDAC1</color>
 </resources>

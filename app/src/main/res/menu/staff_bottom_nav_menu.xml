@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_staff_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Tổng quan" />
+    <item
+        android:id="@+id/navigation_staff_customers"
+        android:icon="@drawable/ic_customers"
+        android:title="Khách hàng" />
+    <item
+        android:id="@+id/navigation_staff_orders"
+        android:icon="@drawable/ic_list_alt"
+        android:title="Đơn hàng" />
+    <item
+        android:id="@+id/navigation_staff_products"
+        android:icon="@drawable/ic_inventory"
+        android:title="Sản phẩm" />
+    <item
+        android:id="@+id/navigation_member"
+        android:icon="@drawable/baseline_account_circle_24"
+        android:title="Hồ sơ" />
+</menu>
