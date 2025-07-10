@@ -48,7 +48,7 @@ dependencies {
     implementation(
         fileTree(
             mapOf(
-                "dir" to "C:\\Users\\triba\\Downloads\\zalopay-sandbox",
+                "dir" to "C:\\Users\\huynh\\OneDrive\\Desktop\\zalopay-sandbox",
                 "include" to listOf("*.aar", "*.jar"),
                 "exclude" to listOf("")
             )
