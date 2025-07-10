@@ -62,6 +62,18 @@ public class OrderHistoryFragment extends Fragment {
         adapter = new OrderHistoryAdapter(new ArrayList<>());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        adapter.setOnOrderClickListener(orderId -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("orderId", orderId);
+
+            try {
+                Navigation.findNavController(requireView())
+                        .navigate(R.id.action_orderHistoryFragment_to_orderDetailFragment, bundle);
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Không thể mở chi tiết đơn hàng", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void observeViewModel() {

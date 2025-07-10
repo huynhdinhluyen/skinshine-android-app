@@ -16,28 +16,48 @@ import com.example.skinshine.data.model.Order;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapter.OrderViewHolder> {
 
     private List<Order> orders;
+    private OnOrderClickListener onOrderClickListener;
 
     public OrderHistoryAdapter(List<Order> orders) {
-        this.orders = orders;
+        this.orders = orders != null ? orders : new ArrayList<>();
+    }
+
+    public interface OnOrderClickListener {
+        void onOrderClick(String orderId);
+    }
+
+    public void setOnOrderClickListener(OnOrderClickListener listener) {
+        this.onOrderClickListener = listener;
     }
 
     @NonNull
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_order_history,
-                parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(
+                R.layout.item_order_history,
+                parent,
+                false
+        );
         return new OrderViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        holder.bind(orders.get(position));
+        Order order = orders.get(position);
+        holder.bind(order);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onOrderClickListener != null && order.getId() != null) {
+                onOrderClickListener.onOrderClick(order.getId());
+            }
+        });
     }
 
     @Override
@@ -46,11 +66,11 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     }
 
     public void updateOrders(List<Order> newOrders) {
-        this.orders = newOrders;
+        this.orders = newOrders != null ? newOrders : new ArrayList<>();
         notifyDataSetChanged();
     }
 
-    static class OrderViewHolder extends RecyclerView.ViewHolder {
+    public static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView textOrderId, textOrderStatus, textOrderDate, textOrderItems, textOrderTotal;
 
         public OrderViewHolder(@NonNull View itemView) {
@@ -63,10 +83,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         }
 
         void bind(Order order) {
-            // Order ID
             textOrderId.setText("Đơn hàng #" + (order.getId() != null ? order.getId().substring(0, 8) : "N/A"));
 
-            // Order Date
             if (order.getCreatedAt() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 textOrderDate.setText("Ngày đặt: " + sdf.format(order.getCreatedAt()));
@@ -74,11 +92,9 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 textOrderDate.setText("Ngày đặt: Không rõ");
             }
 
-            // Order Total
             NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
             textOrderTotal.setText("Tổng tiền: " + formatter.format(order.getTotalAmount()));
 
-            // Order Items Summary
             List<CartItem> items = order.getItems();
             if (items != null && !items.isEmpty()) {
                 String firstItemName = items.get(0).getProductName();
@@ -92,7 +108,6 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 textOrderItems.setText("Không có thông tin sản phẩm");
             }
 
-            // Order Status
             setStatusAppearance(textOrderStatus, order.getStatus());
         }
 
@@ -107,6 +122,10 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 case "PROCESSING":
                     statusText = "Đang xử lý";
                     backgroundResId = R.drawable.status_background_processing;
+                    break;
+                case "DELIVERING":
+                    statusText = "Đang giao";
+                    backgroundResId = R.drawable.status_background_delivering;
                     break;
                 case "DELIVERED":
                     statusText = "Đã giao";

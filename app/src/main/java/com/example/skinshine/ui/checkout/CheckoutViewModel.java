@@ -34,6 +34,16 @@ public class CheckoutViewModel extends ViewModel {
     private final MutableLiveData<Result<Void>> _postPaymentResult = new MutableLiveData<>();
     public final LiveData<Result<Void>> postPaymentResult = _postPaymentResult;
 
+    private final MutableLiveData<String> shippingAddress = new MutableLiveData<>();
+
+    public void setShippingAddress(String address) {
+        shippingAddress.setValue(address);
+    }
+
+    public LiveData<String> getShippingAddress() {
+        return shippingAddress;
+    }
+
     public CheckoutViewModel(SavedStateHandle savedStateHandle) {
         this.paymentRepository = new PaymentRepositoryImpl();
         this.orderRepository = new OrderRepositoryImpl();
@@ -41,7 +51,7 @@ public class CheckoutViewModel extends ViewModel {
         this.savedStateHandle = savedStateHandle;
     }
 
-    public void placeOrderAndRequestPayment(List<CartItem> items, String paymentMethod) {
+    public void placeOrderAndRequestPayment(List<CartItem> items, String paymentMethod, String address) {
         _zaloPayTokenResult.setValue(Result.loading());
         long totalAmount;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
