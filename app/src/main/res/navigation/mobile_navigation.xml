@@ -65,10 +65,24 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/orderHistoryFragment"
+        android:id="@+id/navigation_order_history"
         android:name="com.example.skinshine.ui.order_history.OrderHistoryFragment"
         android:label="Lịch sử đơn hàng"
-        tools:layout="@layout/fragment_order_history" />
+        tools:layout="@layout/fragment_order_history">
+        <action
+            android:id="@+id/action_orderHistoryFragment_to_orderDetailFragment"
+            app:destination="@id/orderDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderDetailFragment"
+        android:name="com.example.skinshine.ui.order_detail.OrderDetailFragment"
+        android:label="Chi tiết đơn hàng"
+        tools:layout="@layout/fragment_order_detail">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_category"
@@ -95,7 +109,7 @@
             app:destination="@id/loginFragment" />
         <action
             android:id="@+id/action_profileFragment_to_orderHistoryFragment"
-            app:destination="@id/orderHistoryFragment" />
+            app:destination="@id/navigation_order_history" />
     </fragment>
 
     <fragment
