@@ -86,7 +86,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void refreshCurrentUser() {
-        // Force refresh by detaching and reattaching listener
         if (userListener != null) {
             userListener.remove();
         }

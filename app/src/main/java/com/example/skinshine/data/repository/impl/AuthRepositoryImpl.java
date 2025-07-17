@@ -57,13 +57,11 @@ public class AuthRepositoryImpl implements AuthRepository {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
                         if (user != null) {
-                            // Update profile
                             user.updateProfile(new UserProfileChangeRequest.Builder()
                                             .setDisplayName(fullName)
                                             .build())
                                     .addOnCompleteListener(profileTask -> {
                                         if (profileTask.isSuccessful()) {
-                                            // Save user data to Firestore
                                             saveUserToFirestore(user.getUid(), fullName, email, phone, registerResult);
                                         } else {
                                             registerResult.setValue(Result.error("Lỗi khi cập nhật profile"));
@@ -105,7 +103,7 @@ public class AuthRepositoryImpl implements AuthRepository {
                 .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    String role = "customer"; // Default role
+                    String role = "customer";
                     if (documentSnapshot.exists() && documentSnapshot.getString("role") != null) {
                         role = documentSnapshot.getString("role");
                     }

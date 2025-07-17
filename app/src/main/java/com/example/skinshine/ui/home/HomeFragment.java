@@ -76,8 +76,6 @@ public class HomeFragment extends Fragment {
     private void initViews(View view) {
         recyclerViewProducts = view.findViewById(R.id.recyclerViewProducts);
         progressBar = view.findViewById(R.id.progressBarHome);
-        // Add error TextView to your layout if not exists
-        // errorTextView = view.findViewById(R.id.textViewError);
     }
 
     private void setupViewModels() {
