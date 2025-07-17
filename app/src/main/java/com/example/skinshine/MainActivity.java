@@ -29,27 +29,19 @@ public class MainActivity extends AppCompatActivity {
     private CartViewModel cartViewModel;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseAuth mAuth;
-    private String currentUserRole = "customer"; // Default role
+    private String currentUserRole = "customer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setupSystemBars();
-
         cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
         mAuth = FirebaseAuth.getInstance();
-
-        // XỬ LÝ ROLE TỪ INTENT TRƯỚC KHI SETUP NAVIGATION
         handleUserRoleFromIntent();
-
         setupNavigation();
         setupAuthStateListener();
-
-        // Initialize ZaloPay SDK
         ZaloPaySDK.init(2553, vn.zalopay.sdk.Environment.SANDBOX);
     }
 
@@ -80,12 +72,9 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             NavigationUI.setupWithNavController(navView, navController);
-
-            // Navigate to staff dashboard
             navController.navigate(R.id.navigation_staff_dashboard);
 
         } else {
-            // Setup cho Customer
             navView.getMenu().clear();
             navView.inflateMenu(R.menu.bottom_nav_menu);
 
@@ -98,12 +87,8 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             NavigationUI.setupWithNavController(navView, navController);
-
-            // Navigate to home
             navController.navigate(R.id.navigation_home);
         }
-
-        // Handle destination changes để ẩn/hiện bottom nav
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.loginFragment ||
                     destination.getId() == R.id.registerFragment ||

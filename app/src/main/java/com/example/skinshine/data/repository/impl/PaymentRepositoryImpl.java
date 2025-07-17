@@ -34,13 +34,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                     resultLiveData.postValue(Result.success(zpTransToken));
                 } else {
                     String returnMessage = data.getString("return_message");
-                    // Sửa lỗi: Result.error() chỉ nhận 1 tham số
                     resultLiveData.postValue(Result.error(returnMessage));
                 }
             } catch (Exception e) {
-                // Sửa lỗi: Sử dụng Log.e thay cho printStackTrace()
                 Log.e(TAG, "Lỗi khi tạo đơn hàng ZaloPay", e);
-                // Sửa lỗi: Result.error() chỉ nhận 1 tham số
                 resultLiveData.postValue(Result.error("Lỗi không xác định: " + e.getMessage()));
             }
         });

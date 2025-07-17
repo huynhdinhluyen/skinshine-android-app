@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.skinshine.data.model.CartItem;
+import com.example.skinshine.data.model.Result;
 import com.example.skinshine.data.repository.CartRepository;
 import com.example.skinshine.data.repository.impl.CartRepositoryImpl;
 
@@ -24,11 +25,11 @@ public class CartViewModel extends ViewModel {
         this.loadingLiveData = new MutableLiveData<>(false);
         this.cartItemCount = new MediatorLiveData<>();
 
-        // Calculate total items when cart changes
-        cartItemCount.addSource(cartRepository.getCartItems(), cartItems -> {
-            if (cartItems != null) {
+        // FIX: Handle Result wrapper correctly
+        cartItemCount.addSource(cartRepository.getCartItems(), result -> {
+            if (result != null && result.isSuccess() && result.getData() != null) {
                 int total = 0;
-                for (CartItem item : cartItems) {
+                for (CartItem item : result.getData()) {
                     total += item.getQuantity();
                 }
                 cartItemCount.setValue(total);
@@ -38,7 +39,7 @@ public class CartViewModel extends ViewModel {
         });
     }
 
-    public LiveData<List<CartItem>> getCartItems() {
+    public LiveData<Result<List<CartItem>>> getCartItems() {
         return cartRepository.getCartItems();
     }
 
@@ -120,9 +121,7 @@ public class CartViewModel extends ViewModel {
     }
 
     public void refreshCartItems() {
-        if (cartRepository instanceof CartRepositoryImpl) {
-            ((CartRepositoryImpl) cartRepository).refreshCart();
-        }
+        cartRepository.refreshCart();
     }
 
     @Override
