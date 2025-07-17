@@ -24,8 +24,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Category> categories = new ArrayList<>();
-
-                    // Add "All" option first
                     Category allCategory = new Category();
                     allCategory.setId("all");
                     allCategory.setName("Tất cả");

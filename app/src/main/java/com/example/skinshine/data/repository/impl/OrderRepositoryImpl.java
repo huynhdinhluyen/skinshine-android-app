@@ -57,11 +57,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
         String userId = auth.getCurrentUser().getUid();
 
-        // SỬA LẠI QUERY ĐỂ TRÁNH LỖI INDEX
-        // Thay vì dùng orderBy với whereEqualTo, ta sẽ sắp xếp trong code
         db.collection("orders")
                 .whereEqualTo("userId", userId)
-                // .orderBy("createdAt", Query.Direction.DESCENDING) // XÓA DÒNG NÀY
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
                         ordersResult.postValue(Result.error(e.getMessage()));
@@ -75,7 +72,6 @@ public class OrderRepositoryImpl implements OrderRepository {
                             orders.add(order);
                         }
 
-                        // SẮP XẾP TRONG CODE THAY VÌ FIRESTORE
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             orders.sort((o1, o2) -> {
                                 if (o1.getCreatedAt() == null && o2.getCreatedAt() == null)
@@ -130,10 +126,8 @@ public class OrderRepositoryImpl implements OrderRepository {
             return ordersResult;
         }
 
-        // CŨNG SỬA TƯƠNG TỰ CHO METHOD NÀY
         db.collection("orders")
                 .whereEqualTo("userId", userId)
-                // .orderBy("createdAt", Query.Direction.DESCENDING) // XÓA DÒNG NÀY
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
                         ordersResult.setValue(Result.error(e.getMessage()));
@@ -148,7 +142,6 @@ public class OrderRepositoryImpl implements OrderRepository {
                             orders.add(order);
                         }
 
-                        // SẮP XẾP TRONG CODE
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             orders.sort((o1, o2) -> {
                                 if (o1.getCreatedAt() == null && o2.getCreatedAt() == null)
@@ -171,8 +164,6 @@ public class OrderRepositoryImpl implements OrderRepository {
     public LiveData<Result<List<Order>>> getAllOrders() {
         MutableLiveData<Result<List<Order>>> ordersResult = new MutableLiveData<>();
         ordersResult.setValue(Result.loading());
-
-        // CHỈ LẤY TẤT CẢ ĐƠN HÀNG KHÔNG CẦN SẮP XẾP PHỨC TẠP
         db.collection("orders")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
@@ -188,7 +179,6 @@ public class OrderRepositoryImpl implements OrderRepository {
                             orders.add(order);
                         }
 
-                        // SẮP XẾP TRONG CODE
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             orders.sort((o1, o2) -> {
                                 if (o1.getCreatedAt() == null && o2.getCreatedAt() == null)

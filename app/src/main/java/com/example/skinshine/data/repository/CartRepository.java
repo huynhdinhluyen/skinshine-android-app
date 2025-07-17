@@ -3,11 +3,12 @@ package com.example.skinshine.data.repository;
 import androidx.lifecycle.LiveData;
 
 import com.example.skinshine.data.model.CartItem;
+import com.example.skinshine.data.model.Result;
 
 import java.util.List;
 
 public interface CartRepository {
-    LiveData<List<CartItem>> getCartItems();
+    LiveData<Result<List<CartItem>>> getCartItems();
 
     void addToCart(String productId, String productName, String imageUrl, double price, int quantity, CartCallback callback);
 

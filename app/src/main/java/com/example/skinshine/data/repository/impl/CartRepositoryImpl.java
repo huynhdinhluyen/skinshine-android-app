@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.skinshine.data.model.CartItem;
+import com.example.skinshine.data.model.Result;
 import com.example.skinshine.data.repository.CartRepository;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -33,8 +35,39 @@ public class CartRepositoryImpl implements CartRepository {
     }
 
     @Override
-    public LiveData<List<CartItem>> getCartItems() {
-        return cartItemsLiveData;
+    public LiveData<Result<List<CartItem>>> getCartItems() {
+        MutableLiveData<Result<List<CartItem>>> cartResult = new MutableLiveData<>();
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            cartResult.setValue(Result.success(new ArrayList<>()));
+            return cartResult;
+        }
+
+        cartResult.setValue(Result.loading());
+
+        db.collection("users")
+                .document(currentUser.getUid())
+                .collection("cartItems")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        cartResult.setValue(Result.error(e.getMessage()));
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        List<CartItem> items = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : snapshots) {
+                            CartItem item = document.toObject(CartItem.class);
+                            items.add(item);
+                        }
+                        cartResult.setValue(Result.success(items));
+                    } else {
+                        cartResult.setValue(Result.success(new ArrayList<>()));
+                    }
+                });
+
+        return cartResult;
     }
 
     private void attachCartListener() {
@@ -84,9 +117,9 @@ public class CartRepositoryImpl implements CartRepository {
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        // Update existing item
-                        long currentQuantity = doc.getLong("quantity") != null ? doc.getLong("quantity") : 0;
-                        long newQuantity = currentQuantity + quantity;
+                        Long currentQuantityLong = doc.getLong("quantity");
+                        int currentQuantity = currentQuantityLong != null ? currentQuantityLong.intValue() : 0;
+                        int newQuantity = currentQuantity + quantity;
 
                         db.collection(cartPath)
                                 .document(productId)
@@ -94,7 +127,6 @@ public class CartRepositoryImpl implements CartRepository {
                                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
                     } else {
-                        // Add new item
                         Map<String, Object> data = new HashMap<>();
                         data.put("productId", productId);
                         data.put("productName", productName);
@@ -209,9 +241,5 @@ public class CartRepositoryImpl implements CartRepository {
             cartListener.remove();
             cartListener = null;
         }
-    }
-
-    public void onAuthStateChanged() {
-        attachCartListener();
     }
 }

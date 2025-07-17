@@ -172,7 +172,17 @@ public class CartFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        cartViewModel.getCartItems().observe(getViewLifecycleOwner(), this::updateCartUI);
+        cartViewModel.getCartItems().observe(getViewLifecycleOwner(), result -> {
+            if (result != null) {
+                if (result.isLoading()) {
+                } else if (result.isSuccess()) {
+                    updateCartUI(result.getData());
+                } else if (result.isError()) {
+                    Toast.makeText(getContext(), "Lỗi: " + result.getMessage(), Toast.LENGTH_SHORT).show();
+                    updateCartUI(new ArrayList<>());
+                }
+            }
+        });
 
         cartViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
